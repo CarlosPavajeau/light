@@ -1,0 +1,24 @@
+{
+  "name": "@light/auth",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@light/db": "workspace:*",
+    "@light/env": "workspace:*",
+    "better-auth": "catalog:",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@light/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}
