@@ -1,5 +1,6 @@
 import type { AppRouter } from "@light/api/routers/index"
 import { Toaster } from "@light/ui/components/sonner"
+import { TooltipProvider } from "@light/ui/components/tooltip"
 import type { QueryClient } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import {
@@ -11,7 +12,7 @@ import {
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
 import type { TRPCOptionsProxy } from "@trpc/tanstack-react-query"
 
-import Header from "../components/header"
+import Header from "@/components/header"
 
 import appCss from "../index.css?url"
 export type RouterAppContext = {
@@ -51,10 +52,12 @@ function RootDocument() {
         <HeadContent />
       </head>
       <body>
-        <div className="grid h-svh grid-rows-[auto_1fr]">
-          <Header />
-          <Outlet />
-        </div>
+        <TooltipProvider>
+          <div className="grid h-svh grid-rows-[auto_1fr]">
+            <Header />
+            <Outlet />
+          </div>
+        </TooltipProvider>
         <Toaster richColors />
         <TanStackRouterDevtools position="bottom-left" />
         <ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
