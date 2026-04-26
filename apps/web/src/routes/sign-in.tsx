@@ -15,7 +15,7 @@ import {
 } from "@light/ui/components/input-group"
 import { Spinner } from "@light/ui/components/spinner"
 import { useMutation } from "@tanstack/react-query"
-import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import { EyeClosedIcon, EyeIcon } from "lucide-react"
 import { useState } from "react"
 import { Controller, useForm } from "react-hook-form"
@@ -155,6 +155,18 @@ function RouteComponent() {
           </Button>
         </FieldGroup>
       </form>
+
+      <div className="mt-6 flex flex-col items-center gap-3 text-center">
+        <p className="text-sm text-muted-foreground">
+          ¿No tienes una cuenta?{" "}
+          <Link
+            to="/sign-up"
+            className="font-medium text-foreground underline-offset-4 hover:underline"
+          >
+            Crear una
+          </Link>
+        </p>
+      </div>
     </div>
   )
 }
