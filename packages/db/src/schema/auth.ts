@@ -16,6 +16,13 @@ export const users = pgTable(
     email: text().notNull(),
     emailVerified: boolean("email_verified").default(false).notNull(),
     image: text(),
+    role: text("role"),
+    banned: boolean("banned"),
+    banReason: text("ban_reason"),
+    banExpires: timestamp("ban_expires", {
+      precision: 6,
+      withTimezone: true,
+    }),
     createdAt: timestamp("created_at")
       .default(sql`now()`)
       .notNull(),
@@ -58,6 +65,7 @@ export const sessions = pgTable(
     id: text().primaryKey(),
     expiresAt: timestamp("expires_at").notNull(),
     token: text().notNull(),
+    impersonatedBy: text("impersonated_by"),
     createdAt: timestamp("created_at")
       .default(sql`now()`)
       .notNull(),
