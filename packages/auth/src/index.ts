@@ -13,6 +13,7 @@ export function createAuth() {
       provider: "pg",
 
       schema,
+      usePlural: true,
     }),
     trustedOrigins: [env.CORS_ORIGIN],
     emailAndPassword: {
