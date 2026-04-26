@@ -12,9 +12,9 @@ import {
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
 import type { TRPCOptionsProxy } from "@trpc/tanstack-react-query"
 
-import Header from "@/components/header"
-
 import appCss from "../index.css?url"
+import geist from "@fontsource-variable/geist/wght.css?url"
+
 export type RouterAppContext = {
   trpc: TRPCOptionsProxy<AppRouter>
   queryClient: QueryClient
@@ -36,6 +36,10 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
     ],
     links: [
       {
+        href: geist,
+        rel: "stylesheet",
+      },
+      {
         rel: "stylesheet",
         href: appCss,
       },
@@ -54,7 +58,6 @@ function RootDocument() {
       <body>
         <TooltipProvider>
           <div className="grid h-svh grid-rows-[auto_1fr]">
-            
             <Outlet />
           </div>
         </TooltipProvider>
