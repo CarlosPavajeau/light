@@ -6,7 +6,9 @@ import { protectedProcedure, router } from ".."
 import { newId } from "../lib/uid"
 
 const schema = z.object({
-  name: z.string(),
+  name: z
+    .string()
+    .min(3, { message: "El nombre debe tener al menos 3 caracteres" }),
   description: z.string().optional(),
 })
 
