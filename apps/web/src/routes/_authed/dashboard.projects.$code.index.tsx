@@ -12,7 +12,7 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { CreateCampaignDialog } from "@/components/campaigns/create-dialog"
 import { useTRPC } from "@/utils/trpc"
 
-export const Route = createFileRoute("/_authed/dashboard/projects/$code")({
+export const Route = createFileRoute("/_authed/dashboard/projects/$code/")({
   component: RouteComponent,
 })
 
@@ -77,7 +77,20 @@ function RouteComponent() {
                 )}
               </ItemContent>
               <ItemActions>
-                <Button variant="outline" size="sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  render={
+                    <Link
+                      to="/dashboard/projects/$code/c/$campaignCode"
+                      params={{
+                        code: project.code,
+                        campaignCode: campaign.code,
+                      }}
+                    />
+                  }
+                  nativeButton={false}
+                >
                   Ver detalles
                 </Button>
               </ItemActions>
