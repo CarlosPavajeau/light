@@ -1,7 +1,7 @@
-import { createContext } from "@light/api/context";
-import { appRouter } from "@light/api/routers/index";
-import { createFileRoute } from "@tanstack/react-router";
-import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
+import { createContext } from "@light/api/context"
+import { appRouter } from "@light/api/routers/index"
+import { createFileRoute } from "@tanstack/react-router"
+import { fetchRequestHandler } from "@trpc/server/adapters/fetch"
 
 function handler({ request }: { request: Request }) {
   return fetchRequestHandler({
@@ -9,7 +9,7 @@ function handler({ request }: { request: Request }) {
     router: appRouter,
     createContext,
     endpoint: "/api/trpc",
-  });
+  })
 }
 
 export const Route = createFileRoute("/api/trpc/$")({
@@ -19,4 +19,4 @@ export const Route = createFileRoute("/api/trpc/$")({
       POST: handler,
     },
   },
-});
+})

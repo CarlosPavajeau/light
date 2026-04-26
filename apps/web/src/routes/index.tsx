@@ -1,11 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query"
+import { createFileRoute } from "@tanstack/react-router"
 
-import { useTRPC } from "@/utils/trpc";
+import { useTRPC } from "@/utils/trpc"
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,
-});
+})
 
 const TITLE_TEXT = `
  ██████╗ ███████╗████████╗████████╗███████╗██████╗
@@ -21,11 +21,11 @@ const TITLE_TEXT = `
     ██║       ╚════██║   ██║   ██╔══██║██║     ██╔═██╗
     ██║       ███████║   ██║   ██║  ██║╚██████╗██║  ██╗
     ╚═╝       ╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝
- `;
+ `
 
 function HomeComponent() {
-  const trpc = useTRPC();
-  const healthCheck = useQuery(trpc.healthCheck.queryOptions());
+  const trpc = useTRPC()
+  const healthCheck = useQuery(trpc.healthCheck.queryOptions())
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-2">
@@ -37,16 +37,16 @@ function HomeComponent() {
             <div
               className={`h-2 w-2 rounded-full ${healthCheck.data ? "bg-green-500" : "bg-red-500"}`}
             />
-            <span className="text-muted-foreground text-sm">
+            <span className="text-sm text-muted-foreground">
               {healthCheck.isLoading
                 ? "Checking..."
-                : healthCheck.data
+                : (healthCheck.data
                   ? "Connected"
-                  : "Disconnected"}
+                  : "Disconnected")}
             </span>
           </div>
         </section>
       </div>
     </div>
-  );
+  )
 }

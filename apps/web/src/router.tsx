@@ -1,16 +1,16 @@
-import type { AppRouter } from "@light/api/routers/index";
-import { QueryCache, QueryClient } from "@tanstack/react-query";
+import type { AppRouter } from "@light/api/routers/index"
+import { QueryCache, QueryClient } from "@tanstack/react-query"
 
-import "./index.css";
-import { createRouter as createTanStackRouter } from "@tanstack/react-router";
-import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
-import { createTRPCClient, httpBatchLink } from "@trpc/client";
-import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
-import { toast } from "sonner";
+import "./index.css"
+import { createRouter as createTanStackRouter } from "@tanstack/react-router"
+import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query"
+import { createTRPCClient, httpBatchLink } from "@trpc/client"
+import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query"
+import { toast } from "sonner"
 
-import Loader from "./components/loader";
-import { routeTree } from "./routeTree.gen";
-import { TRPCProvider } from "./utils/trpc";
+import Loader from "./components/loader"
+import { routeTree } from "./routeTree.gen"
+import { TRPCProvider } from "./utils/trpc"
 
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -20,11 +20,11 @@ export const queryClient = new QueryClient({
           label: "retry",
           onClick: query.invalidate,
         },
-      });
+      })
     },
   }),
   defaultOptions: { queries: { staleTime: 60 * 1000 } },
-});
+})
 
 const trpcClient = createTRPCClient<AppRouter>({
   links: [
@@ -34,16 +34,16 @@ const trpcClient = createTRPCClient<AppRouter>({
         return fetch(url, {
           ...options,
           credentials: "include",
-        });
+        })
       },
     }),
   ],
-});
+})
 
 const trpc = createTRPCOptionsProxy({
   client: trpcClient,
   queryClient,
-});
+})
 
 export const getRouter = () => {
   const router = createTanStackRouter({
@@ -58,18 +58,18 @@ export const getRouter = () => {
         {children}
       </TRPCProvider>
     ),
-  });
+  })
 
   setupRouterSsrQueryIntegration({
     router,
     queryClient,
-  });
+  })
 
-  return router;
-};
+  return router
+}
 
 declare module "@tanstack/react-router" {
   type Register = {
-    router: ReturnType<typeof getRouter>;
-  };
+    router: ReturnType<typeof getRouter>
+  }
 }

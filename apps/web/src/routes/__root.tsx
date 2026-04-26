@@ -1,17 +1,22 @@
-import type { AppRouter } from "@light/api/routers/index";
-import { Toaster } from "@light/ui/components/sonner";
-import type { QueryClient } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import type { TRPCOptionsProxy } from "@trpc/tanstack-react-query";
+import type { AppRouter } from "@light/api/routers/index"
+import { Toaster } from "@light/ui/components/sonner"
+import type { QueryClient } from "@tanstack/react-query"
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
+import {
+  HeadContent,
+  Outlet,
+  Scripts,
+  createRootRouteWithContext,
+} from "@tanstack/react-router"
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
+import type { TRPCOptionsProxy } from "@trpc/tanstack-react-query"
 
-import Header from "../components/header";
+import Header from "../components/header"
 
-import appCss from "../index.css?url";
+import appCss from "../index.css?url"
 export type RouterAppContext = {
-  trpc: TRPCOptionsProxy<AppRouter>;
-  queryClient: QueryClient;
+  trpc: TRPCOptionsProxy<AppRouter>
+  queryClient: QueryClient
 }
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
@@ -37,7 +42,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
   }),
 
   component: RootDocument,
-});
+})
 
 function RootDocument() {
   return (
@@ -56,5 +61,5 @@ function RootDocument() {
         <Scripts />
       </body>
     </html>
-  );
+  )
 }

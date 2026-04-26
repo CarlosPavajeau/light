@@ -1,29 +1,29 @@
-import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query"
+import { createFileRoute, redirect } from "@tanstack/react-router"
 
-import { getUser } from "@/functions/get-user";
-import { useTRPC } from "@/utils/trpc";
+import { getUser } from "@/functions/get-user"
+import { useTRPC } from "@/utils/trpc"
 
 export const Route = createFileRoute("/dashboard")({
   component: RouteComponent,
   beforeLoad: async () => {
-    const session = await getUser();
-    return { session };
+    const session = await getUser()
+    return { session }
   },
   loader: ({ context }) => {
     if (!context.session) {
       throw redirect({
         to: "/login",
-      });
+      })
     }
   },
-});
+})
 
 function RouteComponent() {
-  const { session } = Route.useRouteContext();
+  const { session } = Route.useRouteContext()
 
-  const trpc = useTRPC();
-  const privateData = useQuery(trpc.privateData.queryOptions());
+  const trpc = useTRPC()
+  const privateData = useQuery(trpc.privateData.queryOptions())
 
   return (
     <div>
@@ -31,5 +31,5 @@ function RouteComponent() {
       <p>Welcome {session?.user.name}</p>
       <p>API: {privateData.data?.message}</p>
     </div>
-  );
+  )
 }
