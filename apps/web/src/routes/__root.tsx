@@ -54,7 +54,7 @@ function RootDocument() {
       <body>
         <TooltipProvider>
           <div className="grid h-svh grid-rows-[auto_1fr]">
-            <Header />
+            
             <Outlet />
           </div>
         </TooltipProvider>
