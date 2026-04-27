@@ -59,6 +59,35 @@ export const campaignsRouter = router({
     return response
   }),
 
+  listParticipants: protectedProcedure
+    .input(z.object({ campaignId: z.number() }))
+    .query(async ({ input }) => {
+      const { campaignId } = input
+
+      const dbResponse = await db.query.campaignParticipants.findMany({
+        where: {
+          campaignId,
+        },
+        with: {
+          participant: {
+            columns: {
+              id: true,
+              name: true,
+              lastName: true,
+              email: true,
+            },
+          },
+        },
+      })
+
+      const response = dbResponse.map(({ participant, ...rest }) => ({
+        ...rest,
+        ...participant,
+      }))
+
+      return response
+    }),
+
   get: protectedProcedure
     .input(z.object({ code: z.string() }))
     .query(async ({ input }) => {
@@ -101,8 +130,6 @@ export const campaignsRouter = router({
   addParticipant: protectedProcedure
     .input(addParticipantSchema)
     .mutation(async ({ input }) => {
-      const { campaignId, participantId } = input
-
       const response = await db
         .insert(campaignParticipants)
         .values({

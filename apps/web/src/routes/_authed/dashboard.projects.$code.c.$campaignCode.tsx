@@ -1,5 +1,10 @@
 import { Button } from "@light/ui/components/button"
-import { Item, ItemTitle } from "@light/ui/components/item"
+import {
+  Item,
+  ItemContent,
+  ItemDescription,
+  ItemTitle,
+} from "@light/ui/components/item"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
 
@@ -48,17 +53,47 @@ function RouteComponent() {
       </div>
 
       <div className="flex flex-col gap-4">
-        <h2 className="text-sm font-medium">Participantes</h2>
-        <ul className="flex flex-col gap-2">
-          {campaign.participants?.map((p) => (
-            <Item key={p.id} variant="muted">
-              <ItemTitle>
-                {p.name} {p.lastName}
-              </ItemTitle>
-            </Item>
-          ))}
-        </ul>
+        <h2 className="font-medium">Participantes</h2>
+        <CampaignParticipants campaignId={campaign.id} />
       </div>
     </div>
+  )
+}
+
+type CampaignParticipantsProps = {
+  campaignId: number
+}
+
+function CampaignParticipants({ campaignId }: CampaignParticipantsProps) {
+  const trpc = useTRPC()
+  const { data: participants, isLoading } = useQuery({
+    ...trpc.campaigns.listParticipants.queryOptions({ campaignId }),
+    enabled: !!campaignId,
+  })
+
+  if (isLoading) {
+    return <span>Cargando participantes...</span>
+  }
+
+  if (!participants?.length) {
+    return <span>No hay participantes</span>
+  }
+
+  return (
+    <ul className="flex flex-col gap-2">
+      {participants.map((p) => (
+        <Item key={p.id} variant="muted">
+          <ItemContent>
+            <ItemTitle>
+              {p.name} {p.lastName}
+            </ItemTitle>
+            <ItemDescription>
+              N° Voucher: {p.voucher ?? "N/A"}, Número de cuenta:{" "}
+              {p.accountNumber ?? "N/A"}
+            </ItemDescription>
+          </ItemContent>
+        </Item>
+      ))}
+    </ul>
   )
 }
