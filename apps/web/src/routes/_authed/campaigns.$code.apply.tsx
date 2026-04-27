@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import type { AppRouter } from "@light/api/routers/index"
 import { Button } from "@light/ui/components/button"
 import {
   Field,
@@ -21,7 +20,6 @@ import {
 import { Spinner } from "@light/ui/components/spinner"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
-import type { inferRouterOutputs } from "@trpc/server"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import z from "zod/v4"
