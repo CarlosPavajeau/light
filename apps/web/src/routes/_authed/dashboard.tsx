@@ -1,8 +1,17 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router"
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router"
 
 import Header from "@/components/header"
 
 export const Route = createFileRoute("/_authed/dashboard")({
+  beforeLoad: ({ context }) => {
+    const { user } = context.session
+
+    if (user.role !== "admin") {
+      throw redirect({
+        to: "/campaigns",
+      })
+    }
+  },
   component: RouteComponent,
 })
 
