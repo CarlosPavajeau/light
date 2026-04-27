@@ -106,8 +106,7 @@ export const campaignsRouter = router({
       const response = await db
         .insert(campaignParticipants)
         .values({
-          campaignId,
-          participantId,
+          ...input,
           code: newId("cppt"),
         })
         .returning()
