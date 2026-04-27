@@ -15,6 +15,7 @@ import {
 } from "@light/ui/components/item"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
+import { CompassIcon } from "lucide-react"
 
 import Header from "@/components/header"
 import { useTRPC } from "@/utils/trpc"
@@ -41,7 +42,9 @@ function RouteComponent() {
     return (
       <Empty>
         <EmptyHeader>
-          <EmptyMedia variant="icon">ICON</EmptyMedia>
+          <EmptyMedia variant="icon">
+            <CompassIcon />
+          </EmptyMedia>
           <EmptyTitle>No hay campañas activas</EmptyTitle>
           <EmptyDescription>
             No hay campañas activas en este momento.
