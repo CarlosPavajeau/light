@@ -1,5 +1,5 @@
 import { db } from "@light/db"
-import { campaigns } from "@light/db/schema/projects"
+import { campaignParticipants, campaigns } from "@light/db/schema/projects"
 import { z } from "zod/v4"
 
 import { protectedProcedure, router } from ".."
@@ -68,6 +68,38 @@ export const campaignsRouter = router({
           code,
         },
       })
+
+      return response
+    }),
+
+  getParticipant: protectedProcedure
+    .input(z.object({ campaignId: z.number(), participantId: z.number() }))
+    .query(async ({ input }) => {
+      const { campaignId, participantId } = input
+
+      const response = await db.query.campaignParticipants.findFirst({
+        where: {
+          campaignId,
+          participantId,
+        },
+      })
+
+      return response
+    }),
+
+  addParticipant: protectedProcedure
+    .input(z.object({ campaignId: z.number(), participantId: z.number() }))
+    .mutation(async ({ input }) => {
+      const { campaignId, participantId } = input
+
+      const response = await db
+        .insert(campaignParticipants)
+        .values({
+          campaignId,
+          participantId,
+          code: newId("cppt"),
+        })
+        .returning()
 
       return response
     }),

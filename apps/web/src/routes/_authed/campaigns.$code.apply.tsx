@@ -1,7 +1,7 @@
-import { Button } from "@light/ui/components/button"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 
+import { CampaignApplicationForm } from "@/components/campaigns/application-form"
 import Header from "@/components/header"
 import { ParticipantRegistrationForm } from "@/components/participants/registration-form"
 import { useTRPC } from "@/utils/trpc"
@@ -51,7 +51,10 @@ function RouteComponent() {
 
           <div>
             {participant ? (
-              <Button>En construcción</Button>
+              <CampaignApplicationForm
+                participantId={participant.id}
+                campaignId={campaign.id}
+              />
             ) : (
               <div className="space-y-4">
                 <div className="space-y-1">
