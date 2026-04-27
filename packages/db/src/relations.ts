@@ -12,6 +12,10 @@ export const relations = defineRelations(schema, (r) => ({
   users: {
     accounts: r.many.accounts(),
     sessions: r.many.sessions(),
+    participant: r.one.participants({
+      from: r.users.id,
+      to: r.participants.userId,
+    }),
   },
   sessions: {
     user: r.one.users({
@@ -36,6 +40,10 @@ export const relations = defineRelations(schema, (r) => ({
     campaigns: r.many.campaigns({
       from: r.participants.id.through(r.campaignParticipants.participantId),
       to: r.campaigns.id.through(r.campaignParticipants.campaignId),
+    }),
+    user: r.one.users({
+      from: r.participants.userId,
+      to: r.users.id,
     }),
   },
 }))
