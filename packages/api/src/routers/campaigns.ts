@@ -42,6 +42,22 @@ export const campaignsRouter = router({
 
       return response
     }),
+  listActive: protectedProcedure.query(async () => {
+    const response = await db.query.campaigns.findMany({
+      where: {
+        isActive: true,
+      },
+      with: {
+        project: {
+          columns: {
+            name: true,
+          },
+        },
+      },
+    })
+
+    return response
+  }),
   get: protectedProcedure
     .input(z.object({ code: z.string() }))
     .query(async ({ input }) => {

@@ -14,6 +14,7 @@ import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
+import { Route as AuthedCampaignsRouteImport } from './routes/_authed/campaigns'
 import { Route as AuthedDashboardIndexRouteImport } from './routes/_authed/dashboard.index'
 import { Route as ApiTrpcSplatRouteImport } from './routes/api/trpc/$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -42,6 +43,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedCampaignsRoute = AuthedCampaignsRouteImport.update({
+  id: '/campaigns',
+  path: '/campaigns',
   getParentRoute: () => AuthedRoute,
 } as any)
 const AuthedDashboardIndexRoute = AuthedDashboardIndexRouteImport.update({
@@ -76,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/campaigns': typeof AuthedCampaignsRoute
   '/dashboard': typeof AuthedDashboardRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
@@ -87,6 +94,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/campaigns': typeof AuthedCampaignsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
   '/dashboard': typeof AuthedDashboardIndexRoute
@@ -99,6 +107,7 @@ export interface FileRoutesById {
   '/_authed': typeof AuthedRouteWithChildren
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/_authed/campaigns': typeof AuthedCampaignsRoute
   '/_authed/dashboard': typeof AuthedDashboardRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
@@ -112,6 +121,7 @@ export interface FileRouteTypes {
     | '/'
     | '/sign-in'
     | '/sign-up'
+    | '/campaigns'
     | '/dashboard'
     | '/api/auth/$'
     | '/api/trpc/$'
@@ -123,6 +133,7 @@ export interface FileRouteTypes {
     | '/'
     | '/sign-in'
     | '/sign-up'
+    | '/campaigns'
     | '/api/auth/$'
     | '/api/trpc/$'
     | '/dashboard'
@@ -134,6 +145,7 @@ export interface FileRouteTypes {
     | '/_authed'
     | '/sign-in'
     | '/sign-up'
+    | '/_authed/campaigns'
     | '/_authed/dashboard'
     | '/api/auth/$'
     | '/api/trpc/$'
@@ -186,6 +198,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthedDashboardRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/campaigns': {
+      id: '/_authed/campaigns'
+      path: '/campaigns'
+      fullPath: '/campaigns'
+      preLoaderRoute: typeof AuthedCampaignsRouteImport
       parentRoute: typeof AuthedRoute
     }
     '/_authed/dashboard/': {
@@ -244,10 +263,12 @@ const AuthedDashboardRouteWithChildren = AuthedDashboardRoute._addFileChildren(
 )
 
 interface AuthedRouteChildren {
+  AuthedCampaignsRoute: typeof AuthedCampaignsRoute
   AuthedDashboardRoute: typeof AuthedDashboardRouteWithChildren
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedCampaignsRoute: AuthedCampaignsRoute,
   AuthedDashboardRoute: AuthedDashboardRouteWithChildren,
 }
 
