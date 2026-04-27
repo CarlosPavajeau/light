@@ -4,31 +4,29 @@ import { z } from "zod/v4"
 
 import { protectedProcedure, router } from ".."
 import { newId } from "../lib/uid"
-
-const schema = z.object({
-  name: z
-    .string()
-    .min(3, { message: "El nombre debe tener al menos 3 caracteres" }),
-  description: z.string().optional(),
-  projectId: z.number(),
-})
+import {
+  addParticipantSchema,
+  createCampaignSchema,
+} from "../schemas/campaigns"
 
 export const campaignsRouter = router({
-  create: protectedProcedure.input(schema).mutation(async ({ input }) => {
-    const { name, description, projectId } = input
+  create: protectedProcedure
+    .input(createCampaignSchema)
+    .mutation(async ({ input }) => {
+      const { name, description, projectId } = input
 
-    const campaign = await db
-      .insert(campaigns)
-      .values({
-        code: newId("campaign", 16),
-        name,
-        description,
-        projectId,
-      })
-      .returning()
+      const campaign = await db
+        .insert(campaigns)
+        .values({
+          code: newId("campaign", 16),
+          name,
+          description,
+          projectId,
+        })
+        .returning()
 
-    return campaign
-  }),
+      return campaign
+    }),
 
   listByProject: protectedProcedure
     .input(z.object({ projectId: z.number() }))
@@ -101,7 +99,7 @@ export const campaignsRouter = router({
     }),
 
   addParticipant: protectedProcedure
-    .input(z.object({ campaignId: z.number(), participantId: z.number() }))
+    .input(addParticipantSchema)
     .mutation(async ({ input }) => {
       const { campaignId, participantId } = input
 
