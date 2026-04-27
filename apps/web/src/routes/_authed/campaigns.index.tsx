@@ -14,13 +14,13 @@ import {
   ItemTitle,
 } from "@light/ui/components/item"
 import { useQuery } from "@tanstack/react-query"
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router"
 import { CompassIcon } from "lucide-react"
 
 import Header from "@/components/header"
 import { useTRPC } from "@/utils/trpc"
 
-export const Route = createFileRoute("/_authed/campaigns")({
+export const Route = createFileRoute("/_authed/campaigns/")({
   component: RouteComponent,
 })
 
@@ -82,7 +82,17 @@ function RouteComponent() {
                     )}
                   </ItemContent>
                   <ItemActions>
-                    <Button>Aplicar</Button>
+                    <Button
+                      render={
+                        <Link
+                          to="/campaigns/$code/apply"
+                          params={{ code: campaign.code }}
+                        />
+                      }
+                      nativeButton={false}
+                    >
+                      Aplicar
+                    </Button>
                   </ItemActions>
                 </Item>
               </li>

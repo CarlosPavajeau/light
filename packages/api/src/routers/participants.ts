@@ -11,7 +11,10 @@ const schema = z.object({
   documentType: z.enum(["CC", "CE", "PT"]),
   documentNumber: z.string(),
   documentIssueDate: z.string(),
-  documentExpirationDate: z.string().optional(),
+  documentExpirationDate: z
+    .string()
+    .optional()
+    .transform((val) => (val === "" ? undefined : val)),
   documentIssuePlace: z.string(),
   birthDate: z.string(),
   birthPlace: z.string(),
@@ -23,6 +26,7 @@ const schema = z.object({
   residenceCity: z.string(),
   address: z.string(),
   postalCode: z.string().optional(),
+  userId: z.string(),
 })
 
 export const participantsRouter = router({
@@ -34,6 +38,16 @@ export const participantsRouter = router({
         code: newId("participant", 8),
       })
       .returning()
+
+    return participant
+  }),
+  get: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id
+    const participant = await db.query.participants.findFirst({
+      where: {
+        userId,
+      },
+    })
 
     return participant
   }),
