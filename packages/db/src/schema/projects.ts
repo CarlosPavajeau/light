@@ -10,6 +10,8 @@ import {
   primaryKey,
 } from "drizzle-orm/pg-core"
 
+import { users } from "./auth"
+
 export const projects = pgTable(
   "projects",
   {
@@ -83,8 +85,14 @@ export const participants = pgTable(
       .notNull()
       .defaultNow()
       .$onUpdate(() => new Date()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id),
   },
-  (table) => [uniqueIndex("participants_code_unique_idx").on(table.code)]
+  (table) => [
+    uniqueIndex("participants_code_unique_idx").on(table.code),
+    uniqueIndex("participants_user_id_idx").on(table.userId),
+  ]
 )
 
 export const campaignParticipants = pgTable(
