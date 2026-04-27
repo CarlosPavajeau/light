@@ -50,7 +50,7 @@ function RouteComponent() {
           render={<Link to="/dashboard" />}
           nativeButton={false}
         >
-          Regresar
+          Volver
         </Button>
         <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
           Projecto {project.name}
@@ -61,43 +61,45 @@ function RouteComponent() {
         </span>
       </div>
 
-      <div className="flex flex-wrap justify-between gap-2">
-        <h2 className="text-sm font-medium">Campañas</h2>
-        <CreateCampaignDialog projectId={project.id} />
-      </div>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-wrap justify-between gap-2">
+          <h2 className="font-medium">Campañas</h2>
+          <CreateCampaignDialog projectId={project.id} />
+        </div>
 
-      <ul className="flex flex-col gap-2">
-        {campaigns?.map((campaign) => (
-          <li key={campaign.id}>
-            <Item variant="outline">
-              <ItemContent>
-                <ItemTitle>{campaign.name}</ItemTitle>
-                {campaign.description && (
-                  <ItemDescription>{campaign.description}</ItemDescription>
-                )}
-              </ItemContent>
-              <ItemActions>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  render={
-                    <Link
-                      to="/dashboard/projects/$code/c/$campaignCode"
-                      params={{
-                        code: project.code,
-                        campaignCode: campaign.code,
-                      }}
-                    />
-                  }
-                  nativeButton={false}
-                >
-                  Ver detalles
-                </Button>
-              </ItemActions>
-            </Item>
-          </li>
-        ))}
-      </ul>
+        <ul className="flex flex-col gap-2">
+          {campaigns?.map((campaign) => (
+            <li key={campaign.id}>
+              <Item variant="outline">
+                <ItemContent>
+                  <ItemTitle>{campaign.name}</ItemTitle>
+                  {campaign.description && (
+                    <ItemDescription>{campaign.description}</ItemDescription>
+                  )}
+                </ItemContent>
+                <ItemActions>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    render={
+                      <Link
+                        to="/dashboard/projects/$code/c/$campaignCode"
+                        params={{
+                          code: project.code,
+                          campaignCode: campaign.code,
+                        }}
+                      />
+                    }
+                    nativeButton={false}
+                  >
+                    Ver detalles
+                  </Button>
+                </ItemActions>
+              </Item>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   )
 }
