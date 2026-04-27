@@ -36,7 +36,7 @@ function RouteComponent() {
           render={<Link to="/dashboard/projects/$code" params={{ code }} />}
           nativeButton={false}
         >
-          Volver al inicio
+          Volver
         </Button>
         <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
           Campaña {campaign.name}
