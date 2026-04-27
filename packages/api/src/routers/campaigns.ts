@@ -29,6 +29,7 @@ export const campaignsRouter = router({
 
     return campaign
   }),
+
   listByProject: protectedProcedure
     .input(z.object({ projectId: z.number() }))
     .query(async ({ input }) => {
@@ -42,6 +43,7 @@ export const campaignsRouter = router({
 
       return response
     }),
+
   listActive: protectedProcedure.query(async () => {
     const response = await db.query.campaigns.findMany({
       where: {
@@ -58,6 +60,7 @@ export const campaignsRouter = router({
 
     return response
   }),
+
   get: protectedProcedure
     .input(z.object({ code: z.string() }))
     .query(async ({ input }) => {
@@ -66,6 +69,16 @@ export const campaignsRouter = router({
       const response = await db.query.campaigns.findFirst({
         where: {
           code,
+        },
+        with: {
+          participants: {
+            columns: {
+              id: true,
+              name: true,
+              lastName: true,
+              email: true,
+            },
+          },
         },
       })
 

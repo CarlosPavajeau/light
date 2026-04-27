@@ -1,4 +1,5 @@
 import { Button } from "@light/ui/components/button"
+import { Item, ItemTitle } from "@light/ui/components/item"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
 
@@ -46,8 +47,17 @@ function RouteComponent() {
         </span>
       </div>
 
-      <div className="flex flex-wrap justify-between gap-2">
+      <div className="flex flex-col gap-4">
         <h2 className="text-sm font-medium">Participantes</h2>
+        <ul className="flex flex-col gap-2">
+          {campaign.participants?.map((p) => (
+            <Item key={p.id} variant="muted">
+              <ItemTitle>
+                {p.name} {p.lastName}
+              </ItemTitle>
+            </Item>
+          ))}
+        </ul>
       </div>
     </div>
   )

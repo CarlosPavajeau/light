@@ -46,4 +46,14 @@ export const relations = defineRelations(schema, (r) => ({
       to: r.users.id,
     }),
   },
+  campaignParticipants: {
+    campaign: r.one.campaigns({
+      from: r.campaignParticipants.campaignId,
+      to: r.campaigns.id,
+    }),
+    participant: r.one.participants({
+      from: r.campaignParticipants.participantId,
+      to: r.participants.id,
+    }),
+  },
 }))
