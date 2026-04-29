@@ -1,13 +1,18 @@
+import type { AppRouter } from "@light/api/routers/index"
 import { Button } from "@light/ui/components/button"
 import {
   Item,
+  ItemActions,
   ItemContent,
   ItemDescription,
   ItemTitle,
 } from "@light/ui/components/item"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
+import type { inferRouterOutputs } from "@trpc/server"
+import { useState } from "react"
 
+import { ApplicationDetailsModal } from "@/components/campaigns/application-details-modal"
 import { useTRPC } from "@/utils/trpc"
 
 export const Route = createFileRoute(
@@ -60,6 +65,9 @@ function RouteComponent() {
   )
 }
 
+type Participant =
+  inferRouterOutputs<AppRouter>["campaigns"]["listParticipants"][number]
+
 type CampaignParticipantsProps = {
   campaignId: number
 }
@@ -70,6 +78,15 @@ function CampaignParticipants({ campaignId }: CampaignParticipantsProps) {
     ...trpc.campaigns.listParticipants.queryOptions({ campaignId }),
     enabled: !!campaignId,
   })
+  const [applicationDetailsOpen, setApplicationDetailsOpen] = useState(false)
+  const [currentParticipant, setCurrentParticipant] = useState<
+    Participant | undefined
+  >()
+
+  const handleApplicationViewDetailsClick = (p: Participant) => {
+    setCurrentParticipant(p)
+    setApplicationDetailsOpen(true)
+  }
 
   if (isLoading) {
     return <span>Cargando participantes...</span>
@@ -80,20 +97,32 @@ function CampaignParticipants({ campaignId }: CampaignParticipantsProps) {
   }
 
   return (
-    <ul className="flex flex-col gap-2">
-      {participants.map((p) => (
-        <Item key={p.id} variant="muted">
-          <ItemContent>
-            <ItemTitle>
-              {p.name} {p.lastName}
-            </ItemTitle>
-            <ItemDescription>
-              N° Voucher: {p.voucher ?? "N/A"}, Número de cuenta:{" "}
-              {p.accountNumber ?? "N/A"}
-            </ItemDescription>
-          </ItemContent>
-        </Item>
-      ))}
-    </ul>
+    <>
+      <ApplicationDetailsModal
+        participant={currentParticipant}
+        open={applicationDetailsOpen}
+        onOpenChange={setApplicationDetailsOpen}
+      />
+      <ul className="flex flex-col gap-2">
+        {participants.map((p) => (
+          <Item key={p.id} variant="muted">
+            <ItemContent>
+              <ItemTitle>
+                {p.name} {p.lastName}
+              </ItemTitle>
+              <ItemDescription>
+                N° Voucher: {p.voucher ?? "N/A"}, Número de cuenta:{" "}
+                {p.accountNumber ?? "N/A"}
+              </ItemDescription>
+            </ItemContent>
+            <ItemActions>
+              <Button onClick={() => handleApplicationViewDetailsClick(p)}>
+                Ver detalles
+              </Button>
+            </ItemActions>
+          </Item>
+        ))}
+      </ul>
+    </>
   )
 }

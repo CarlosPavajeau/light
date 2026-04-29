@@ -24,6 +24,7 @@
     "@trpc/server": "catalog:",
     "@trpc/tanstack-react-query": "^11.16.0",
     "better-auth": "catalog:",
+    "date-fns": "^4.1.0",
     "dotenv": "catalog:",
     "lucide-react": "^1.8.0",
     "next-themes": "catalog:",

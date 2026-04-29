@@ -41,11 +41,22 @@ export const participantsRouter = router({
 
     return participant
   }),
+
   get: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id
     const participant = await db.query.participants.findFirst({
       where: {
         userId,
+      },
+    })
+
+    return participant
+  }),
+
+  getById: protectedProcedure.input(z.number()).query(async ({ input }) => {
+    const participant = await db.query.participants.findFirst({
+      where: {
+        id: input,
       },
     })
 
