@@ -9,7 +9,6 @@ import {
 } from "@light/ui/components/dialog"
 import { Spinner } from "@light/ui/components/spinner"
 import { useQuery } from "@tanstack/react-query"
-import { Link } from "@tanstack/react-router"
 import type { inferRouterOutputs } from "@trpc/server"
 import { format, parseISO } from "date-fns"
 import { es } from "date-fns/locale"

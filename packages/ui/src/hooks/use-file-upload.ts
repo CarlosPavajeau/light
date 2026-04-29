@@ -1,6 +1,6 @@
 import type React from "react"
-import { useCallback, useRef, useState } from 'react';
-import type { ChangeEvent, DragEvent, InputHTMLAttributes } from 'react';
+import { useCallback, useRef, useState } from "react"
+import type { ChangeEvent, DragEvent, InputHTMLAttributes } from "react"
 
 export type FileMetadata = {
   name: string
@@ -160,7 +160,9 @@ export const useFileUpload = (
 
   const addFiles = useCallback(
     (newFiles: FileList | File[]) => {
-      if (!newFiles || newFiles.length === 0) {return}
+      if (!newFiles || newFiles.length === 0) {
+        return
+      }
 
       const newFilesArray = [...newFiles]
       const errors: string[] = []
@@ -359,13 +361,13 @@ export const useFileUpload = (
 
   const getInputProps = useCallback(
     (props: InputHTMLAttributes<HTMLInputElement> = {}) => ({
-        ...props,
-        type: "file" as const,
-        onChange: handleFileChange,
-        accept: props.accept || accept,
-        multiple: props.multiple !== undefined ? props.multiple : multiple,
-        ref: inputRef,
-      }),
+      ...props,
+      type: "file" as const,
+      onChange: handleFileChange,
+      accept: props.accept || accept,
+      multiple: props.multiple !== undefined ? props.multiple : multiple,
+      ref: inputRef,
+    }),
     [accept, multiple, handleFileChange]
   )
 
@@ -389,7 +391,9 @@ export const useFileUpload = (
 
 // Helper function to format bytes to human-readable format
 export const formatBytes = (bytes: number, decimals = 2): string => {
-  if (bytes === 0) {return "0 Bytes"}
+  if (bytes === 0) {
+    return "0 Bytes"
+  }
 
   const k = 1024
   const dm = Math.max(0, decimals)
