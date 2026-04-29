@@ -40,17 +40,20 @@ function RouteComponent() {
 
   if (campaigns.length === 0) {
     return (
-      <Empty>
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <CompassIcon />
-          </EmptyMedia>
-          <EmptyTitle>No hay campañas activas</EmptyTitle>
-          <EmptyDescription>
-            No hay campañas activas en este momento.
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <>
+        <Header />
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <CompassIcon />
+            </EmptyMedia>
+            <EmptyTitle>No hay campañas activas</EmptyTitle>
+            <EmptyDescription>
+              No hay campañas activas en este momento.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      </>
     )
   }
 
