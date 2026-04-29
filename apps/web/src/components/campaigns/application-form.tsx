@@ -80,16 +80,8 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
 
     let attachedFile: string
     try {
-      const { url, key } = await trpcClient.s3.createUploadPresignedUrl.mutate()
-      const response = await fetch(url, {
-        method: "PUT",
-        body: selectedFile,
-        headers: { "Content-Type": selectedFile.type },
-      })
-      if (!response.ok) {
-        throw new Error("Error al subir el comprobante de pago")
-      }
-      attachedFile = key
+      // TODO: Implement file upload to S3
+      attachedFile = ""
     } catch {
       setError("attachedFile", {
         message: "Error al subir el comprobante de pago",

@@ -10,7 +10,6 @@
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "noEmit": true,
-    "esModuleInterop": true,
     /* Linting */
     "skipLibCheck": true,
     "strict": true,

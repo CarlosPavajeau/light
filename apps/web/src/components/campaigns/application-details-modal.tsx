@@ -7,7 +7,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@light/ui/components/dialog"
-import { Spinner } from "@light/ui/components/spinner"
 import { useQuery } from "@tanstack/react-query"
 import type { inferRouterOutputs } from "@trpc/server"
 import { format, parseISO } from "date-fns"
@@ -27,6 +26,17 @@ type Props = {
   participant?: Participant
 }
 
+const formatDate = (value: string | null | undefined) => {
+  if (!value) {
+    return "NA"
+  }
+  try {
+    return format(parseISO(value), "dd/MM/yyyy", { locale: es })
+  } catch {
+    return value
+  }
+}
+
 export function ApplicationDetailsModal({
   open,
   onOpenChange,
@@ -38,29 +48,11 @@ export function ApplicationDetailsModal({
     enabled: !!participant?.participantId,
   })
 
-  const { data: fileUrl, isLoading: loadingFileUrl } = useQuery({
-    ...trpc.s3.createDownloadPresignedUrl.queryOptions({
-      code: participant?.attachedFile ?? "",
-    }),
-    enabled: !!participant?.attachedFile,
-  })
-
   if (!participantData || !participant) {
     return null
   }
 
   const name = `${participant.name ?? "NA"} ${participant.lastName ?? "NA"}`
-
-  const formatDate = (value: string | null | undefined) => {
-    if (!value) {
-      return "NA"
-    }
-    try {
-      return format(parseISO(value), "dd/MM/yyyy", { locale: es })
-    } catch {
-      return value
-    }
-  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -73,8 +65,8 @@ export function ApplicationDetailsModal({
           <dl className="flex flex-col gap-3">
             <DetailRow
               label="Documento"
-              value={`${participantData.documentType ?? "NA"} - ${participantData.documentNumber ?? "NA"}`}
-              subvalue={`Expedido: ${formatDate(participantData.documentIssueDate)} en ${participantData.documentIssuePlace ?? "NA"}`}
+              value={`${participantData.documentType} - ${participantData.documentNumber}`}
+              subvalue={`Expedido: ${formatDate(participantData.documentIssueDate)} en ${participantData.documentIssuePlace}`}
             />
             {participantData.documentExpirationDate && (
               <DetailRow
@@ -83,7 +75,7 @@ export function ApplicationDetailsModal({
               />
             )}
             <DetailRow label="Nombre" value={name} />
-            <DetailRow label="Email" value={participantData.email ?? "NA"} />
+            <DetailRow label="Email" value={participantData.email} />
             {participantData.phone && (
               <DetailRow label="Teléfono" value={participantData.phone} />
             )}
@@ -96,12 +88,12 @@ export function ApplicationDetailsModal({
             <DetailRow
               label="Fecha de nacimiento"
               value={formatDate(participantData.birthDate)}
-              subvalue={`Lugar: ${participantData.birthPlace ?? "NA"}`}
+              subvalue={`Lugar: ${participantData.birthPlace}`}
             />
             <DetailRow
               label="Residencia"
-              value={`${participantData.residenceCity ?? "NA"}, ${participantData.residenceState ?? "NA"}, ${participantData.residenceCountry ?? "NA"}`}
-              subvalue={`${participantData.address ?? "NA"}${participantData.postalCode ? ` - CP ${participantData.postalCode}` : ""}`}
+              value={`${participantData.residenceCity}, ${participantData.residenceState}, ${participantData.residenceCountry}`}
+              subvalue={`${participantData.address}${participantData.postalCode ? ` - CP ${participantData.postalCode}` : ""}`}
             />
 
             <DetailRow label="Voucher" value={participant.voucher ?? "NA"} />
@@ -119,19 +111,7 @@ export function ApplicationDetailsModal({
         </div>
 
         <DialogFooter showCloseButton>
-          <Button
-            disabled={loadingFileUrl}
-            render={
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href={fileUrl ?? ""}
-                aria-label="Ver archivo adjunto"
-              />
-            }
-            nativeButton={false}
-          >
-            {loadingFileUrl && <Spinner />}
+          <Button disabled>
             Ver archivo adjunto
             <ExternalLinkIcon data-icon="inline-end" />
           </Button>
