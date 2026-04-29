@@ -70,6 +70,7 @@
         "@light/auth": "workspace:*",
         "@light/db": "workspace:*",
         "@light/env": "workspace:*",
+        "@light/s3": "workspace:*",
         "@trpc/client": "catalog:",
         "@trpc/server": "catalog:",
         "dotenv": "catalog:",

@@ -17,5 +17,7 @@ export const addParticipantSchema = z.object({
   accountNumber: z
     .string()
     .min(1, { message: "El número de cuenta es obligatorio" }),
-  attachedFile: z.string().optional(),
+  attachedFile: z
+    .string()
+    .min(1, { message: "El comprobante de pago es obligatorio" }),
 })
