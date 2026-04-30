@@ -60,6 +60,7 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
       voucher: "",
       accountNumber: "",
       attachedFile: "",
+      amount: "",
     },
   })
 
@@ -161,6 +162,23 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
                   {...field}
                   id={field.name}
                   type="text"
+                  aria-invalid={fieldState.invalid}
+                />
+                <FieldError errors={[fieldState.error]} />
+              </Field>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="amount"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Valor consignado</FieldLabel>
+                <Input
+                  {...field}
+                  id={field.name}
+                  type="number"
                   aria-invalid={fieldState.invalid}
                 />
                 <FieldError errors={[fieldState.error]} />

@@ -17,6 +17,10 @@ export const addParticipantSchema = z.object({
   accountNumber: z
     .string()
     .min(1, { message: "El número de cuenta es obligatorio" }),
+  amount: z.coerce
+    .number<string>()
+    .min(1, { message: "El monto es obligatorio" })
+    .or(z.number()),
   attachedFile: z
     .string()
     .min(1, { message: "El comprobante de pago es obligatorio" }),
