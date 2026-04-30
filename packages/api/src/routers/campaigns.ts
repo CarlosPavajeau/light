@@ -75,6 +75,7 @@ export const campaignsRouter = router({
               name: true,
               lastName: true,
               email: true,
+              documentNumber: true,
             },
           },
         },
