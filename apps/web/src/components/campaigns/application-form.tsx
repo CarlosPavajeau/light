@@ -2,6 +2,13 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { addParticipantSchema } from "@light/api/schemas/campaigns"
 import { Button } from "@light/ui/components/button"
 import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@light/ui/components/empty"
+import {
   Field,
   FieldError,
   FieldGroup,
@@ -11,6 +18,7 @@ import { Input } from "@light/ui/components/input"
 import { Spinner } from "@light/ui/components/spinner"
 import type { FileWithPreview } from "@light/ui/hooks/use-file-upload"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { FolderIcon } from "lucide-react"
 import { useCallback, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -186,5 +194,17 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
     )
   }
 
-  return <span>Ya tiene una aplicación en esta campaña</span>
+  return (
+    <Empty>
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <FolderIcon />
+        </EmptyMedia>
+        <EmptyTitle>Aplicación enviada</EmptyTitle>
+        <EmptyDescription>
+          Ya tiene una aplicación en esta campaña
+        </EmptyDescription>
+      </EmptyHeader>
+    </Empty>
+  )
 }
