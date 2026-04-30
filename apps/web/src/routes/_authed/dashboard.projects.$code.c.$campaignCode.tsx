@@ -94,7 +94,10 @@ function CampaignParticipants({ campaignId }: CampaignParticipantsProps) {
     const query = search.toLocaleLowerCase()
     const fullName =
       `${application.name} ${application.lastName}`.toLocaleLowerCase()
-    return fullName.includes(query)
+    return (
+      fullName.includes(query) ||
+      application.documentNumber?.toLocaleLowerCase().includes(query)
+    )
   })
 
   if (isLoading) {
