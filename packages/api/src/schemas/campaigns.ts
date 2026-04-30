@@ -8,7 +8,7 @@ export const createCampaignSchema = z.object({
   projectId: z.number(),
 })
 
-export const addParticipantSchema = z.object({
+export const addApplicationSchema = z.object({
   campaignId: z.number(),
   participantId: z.number(),
   voucher: z

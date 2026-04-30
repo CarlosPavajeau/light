@@ -5,7 +5,7 @@ import { z } from "zod/v4"
 import { protectedProcedure, router } from ".."
 import { newId } from "../lib/uid"
 import {
-  addParticipantSchema,
+  addApplicationSchema,
   createCampaignSchema,
 } from "../schemas/campaigns"
 
@@ -59,7 +59,7 @@ export const campaignsRouter = router({
     return response
   }),
 
-  listParticipants: protectedProcedure
+  listApplications: protectedProcedure
     .input(z.object({ campaignId: z.number() }))
     .query(async ({ input }) => {
       const { campaignId } = input
@@ -112,7 +112,7 @@ export const campaignsRouter = router({
       return response
     }),
 
-  getParticipant: protectedProcedure
+  getApplication: protectedProcedure
     .input(z.object({ campaignId: z.number(), participantId: z.number() }))
     .query(async ({ input }) => {
       const { campaignId, participantId } = input
@@ -127,8 +127,8 @@ export const campaignsRouter = router({
       return response
     }),
 
-  addParticipant: protectedProcedure
-    .input(addParticipantSchema)
+  addApplication: protectedProcedure
+    .input(addApplicationSchema)
     .mutation(async ({ input }) => {
       const response = await db
         .insert(campaignApplications)

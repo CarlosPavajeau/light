@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { addParticipantSchema } from "@light/api/schemas/campaigns"
+import { addApplicationSchema } from "@light/api/schemas/campaigns"
 import { Button } from "@light/ui/components/button"
 import {
   Empty,
@@ -37,8 +37,8 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
   const trpcClient = useTRPCClient()
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
-  const { data: participant, isLoading } = useQuery({
-    ...trpc.campaigns.getParticipant.queryOptions({
+  const { data: application, isLoading } = useQuery({
+    ...trpc.campaigns.getApplication.queryOptions({
       campaignId,
       participantId,
     }),
@@ -53,7 +53,7 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
     setError,
     formState: { isSubmitting },
   } = useForm({
-    resolver: zodResolver(addParticipantSchema),
+    resolver: zodResolver(addApplicationSchema),
     defaultValues: {
       campaignId,
       participantId,
@@ -66,10 +66,10 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
 
   const queryClient = useQueryClient()
   const { mutateAsync: apply } = useMutation({
-    ...trpc.campaigns.addParticipant.mutationOptions(),
+    ...trpc.campaigns.addApplication.mutationOptions(),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: trpc.campaigns.getParticipant.queryOptions({
+        queryKey: trpc.campaigns.getApplication.queryOptions({
           campaignId,
           participantId,
         }).queryKey,
@@ -131,7 +131,7 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
     return <span>Cargando...</span>
   }
 
-  if (!participant) {
+  if (!application) {
     return (
       <form onSubmit={onSubmit}>
         <FieldGroup>

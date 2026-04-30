@@ -65,8 +65,8 @@ function RouteComponent() {
   )
 }
 
-type Participant =
-  inferRouterOutputs<AppRouter>["campaigns"]["listParticipants"][number]
+type Application =
+  inferRouterOutputs<AppRouter>["campaigns"]["listApplications"][number]
 
 type CampaignParticipantsProps = {
   campaignId: number
@@ -74,17 +74,17 @@ type CampaignParticipantsProps = {
 
 function CampaignParticipants({ campaignId }: CampaignParticipantsProps) {
   const trpc = useTRPC()
-  const { data: participants, isLoading } = useQuery({
-    ...trpc.campaigns.listParticipants.queryOptions({ campaignId }),
+  const { data: applications, isLoading } = useQuery({
+    ...trpc.campaigns.listApplications.queryOptions({ campaignId }),
     enabled: !!campaignId,
   })
   const [applicationDetailsOpen, setApplicationDetailsOpen] = useState(false)
-  const [currentParticipant, setCurrentParticipant] = useState<
-    Participant | undefined
+  const [currentApplication, setCurrentApplication] = useState<
+    Application | undefined
   >()
 
-  const handleApplicationViewDetailsClick = (p: Participant) => {
-    setCurrentParticipant(p)
+  const handleApplicationViewDetailsClick = (application: Application) => {
+    setCurrentApplication(application)
     setApplicationDetailsOpen(true)
   }
 
@@ -92,31 +92,33 @@ function CampaignParticipants({ campaignId }: CampaignParticipantsProps) {
     return <span>Cargando participantes...</span>
   }
 
-  if (!participants?.length) {
+  if (!applications?.length) {
     return <span>No hay participantes</span>
   }
 
   return (
     <>
       <ApplicationDetailsModal
-        participant={currentParticipant}
+        application={currentApplication}
         open={applicationDetailsOpen}
         onOpenChange={setApplicationDetailsOpen}
       />
       <ul className="flex flex-col gap-2">
-        {participants.map((p) => (
-          <Item key={p.id} variant="muted">
+        {applications.map((application) => (
+          <Item key={application.id} variant="muted">
             <ItemContent>
               <ItemTitle>
-                {p.name} {p.lastName}
+                {application.name} {application.lastName}
               </ItemTitle>
               <ItemDescription>
-                N° Voucher: {p.voucher ?? "N/A"}, Número de cuenta:{" "}
-                {p.accountNumber ?? "N/A"}
+                N° Voucher: {application.voucher ?? "N/A"}, Número de cuenta:{" "}
+                {application.accountNumber ?? "N/A"}
               </ItemDescription>
             </ItemContent>
             <ItemActions>
-              <Button onClick={() => handleApplicationViewDetailsClick(p)}>
+              <Button
+                onClick={() => handleApplicationViewDetailsClick(application)}
+              >
                 Ver detalles
               </Button>
             </ItemActions>

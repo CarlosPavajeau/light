@@ -17,13 +17,13 @@ import { useTRPC } from "@/utils/trpc"
 
 import { DetailRow } from "../detail-row"
 
-type Participant =
-  inferRouterOutputs<AppRouter>["campaigns"]["listParticipants"][number]
+type Application =
+  inferRouterOutputs<AppRouter>["campaigns"]["listApplications"][number]
 
 type Props = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  participant?: Participant
+  application?: Application
 }
 
 const formatDate = (value: string | null | undefined) => {
@@ -37,15 +37,22 @@ const formatDate = (value: string | null | undefined) => {
   }
 }
 
+const formatAmount = (value: number | null | undefined) => {
+  if (!value) {
+    return "NA"
+  }
+  return value.toLocaleString("es-ES", { style: "currency", currency: "COP" })
+}
+
 export function ApplicationDetailsModal({
   open,
   onOpenChange,
-  participant,
+  application,
 }: Props) {
   const trpc = useTRPC()
   const { data: participantData } = useQuery({
-    ...trpc.participants.getById.queryOptions(participant?.participantId ?? 0),
-    enabled: !!participant?.participantId,
+    ...trpc.participants.getById.queryOptions(application?.participantId ?? 0),
+    enabled: !!application?.participantId,
   })
 
   const { mutate: presignDownload, isPending } = useMutation({
@@ -58,18 +65,18 @@ export function ApplicationDetailsModal({
   })
 
   const handleDownload = () => {
-    if (!participant || !participant.attachedFile) {
+    if (!application || !application.attachedFile) {
       return
     }
 
-    presignDownload(participant.attachedFile)
+    presignDownload(application.attachedFile)
   }
 
-  if (!participantData || !participant) {
+  if (!participantData || !application) {
     return null
   }
 
-  const name = `${participant.name ?? "NA"} ${participant.lastName ?? "NA"}`
+  const name = `${application.name ?? "NA"} ${application.lastName ?? "NA"}`
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -113,14 +120,18 @@ export function ApplicationDetailsModal({
               subvalue={`${participantData.address}${participantData.postalCode ? ` - CP ${participantData.postalCode}` : ""}`}
             />
 
-            <DetailRow label="Voucher" value={participant.voucher ?? "NA"} />
+            <DetailRow label="Voucher" value={application.voucher ?? "NA"} />
             <DetailRow
               label="Número de cuenta"
-              value={participant.accountNumber ?? "NA"}
+              value={application.accountNumber ?? "NA"}
+            />
+            <DetailRow
+              label="Valor consignado"
+              value={formatAmount(Number(application.amount))}
             />
             <DetailRow
               label="Fecha de aplicación"
-              value={format(participant.createdAt, "dd/MM/yyyy HH:mm a", {
+              value={format(application.createdAt, "dd/MM/yyyy HH:mm a", {
                 locale: es,
               })}
             />
