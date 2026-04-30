@@ -116,7 +116,7 @@ function CampaignParticipants({ campaignId }: CampaignParticipantsProps) {
         onOpenChange={setApplicationDetailsOpen}
       />
       <Input
-        placeholder="Buscar por nombre o apellido..."
+        placeholder="Buscar por nombre o número de documento..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="max-w-sm"
