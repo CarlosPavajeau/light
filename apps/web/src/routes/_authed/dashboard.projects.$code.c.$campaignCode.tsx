@@ -1,5 +1,6 @@
 import type { AppRouter } from "@light/api/routers/index"
 import { Button } from "@light/ui/components/button"
+import { Input } from "@light/ui/components/input"
 import {
   Item,
   ItemActions,
@@ -82,11 +83,19 @@ function CampaignParticipants({ campaignId }: CampaignParticipantsProps) {
   const [currentApplication, setCurrentApplication] = useState<
     Application | undefined
   >()
+  const [search, setSearch] = useState("")
 
   const handleApplicationViewDetailsClick = (application: Application) => {
     setCurrentApplication(application)
     setApplicationDetailsOpen(true)
   }
+
+  const filteredApplications = applications?.filter((application) => {
+    const query = search.toLocaleLowerCase()
+    const fullName =
+      `${application.name} ${application.lastName}`.toLocaleLowerCase()
+    return fullName.includes(query)
+  })
 
   if (isLoading) {
     return <span>Cargando participantes...</span>
@@ -103,8 +112,19 @@ function CampaignParticipants({ campaignId }: CampaignParticipantsProps) {
         open={applicationDetailsOpen}
         onOpenChange={setApplicationDetailsOpen}
       />
+      <Input
+        placeholder="Buscar por nombre o apellido..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="max-w-sm"
+      />
+      {filteredApplications?.length === 0 && (
+        <span className="text-sm text-muted-foreground">
+          No se encontraron participantes
+        </span>
+      )}
       <ul className="flex flex-col gap-2">
-        {applications.map((application) => (
+        {filteredApplications?.map((application) => (
           <Item key={application.id} variant="muted">
             <ItemContent>
               <ItemTitle>
