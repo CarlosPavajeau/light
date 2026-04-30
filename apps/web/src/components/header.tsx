@@ -12,7 +12,7 @@ export default function Header() {
         aria-label="Navegacion principal"
         className="flex w-full items-center justify-between px-4 sm:px-6"
       >
-        <span>Bienvenido</span>
+        <span>LUMEN888</span>
 
         {data && data.user.role === "admin" && (
           <Button render={<Link to="/dashboard" />} nativeButton={false}>

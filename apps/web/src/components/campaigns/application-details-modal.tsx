@@ -75,7 +75,7 @@ export function ApplicationDetailsModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="md:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Detalles de la aplicacion</DialogTitle>
+          <DialogTitle>Detalles de la aplicación</DialogTitle>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto">

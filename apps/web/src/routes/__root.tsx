@@ -31,7 +31,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "Light",
+        title: "LUMEN888",
       },
     ],
     links: [

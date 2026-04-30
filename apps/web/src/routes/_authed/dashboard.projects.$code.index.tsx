@@ -62,7 +62,7 @@ function RouteComponent() {
       </div>
 
       <div className="flex flex-col gap-4">
-        <div className="flex flex-wrap justify-between gap-2">
+        <div className="flex flex-col gap-2">
           <h2 className="font-medium">Campañas</h2>
           <CreateCampaignDialog projectId={project.id} />
         </div>
