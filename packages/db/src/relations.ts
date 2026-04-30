@@ -32,27 +32,27 @@ export const relations = defineRelations(schema, (r) => ({
       to: r.projects.id,
     }),
     participants: r.many.participants({
-      from: r.campaigns.id.through(r.campaignParticipants.campaignId),
-      to: r.participants.id.through(r.campaignParticipants.participantId),
+      from: r.campaigns.id.through(r.campaignApplications.campaignId),
+      to: r.participants.id.through(r.campaignApplications.participantId),
     }),
   },
   participants: {
     campaigns: r.many.campaigns({
-      from: r.participants.id.through(r.campaignParticipants.participantId),
-      to: r.campaigns.id.through(r.campaignParticipants.campaignId),
+      from: r.participants.id.through(r.campaignApplications.participantId),
+      to: r.campaigns.id.through(r.campaignApplications.campaignId),
     }),
     user: r.one.users({
       from: r.participants.userId,
       to: r.users.id,
     }),
   },
-  campaignParticipants: {
+  campaignApplications: {
     campaign: r.one.campaigns({
-      from: r.campaignParticipants.campaignId,
+      from: r.campaignApplications.campaignId,
       to: r.campaigns.id,
     }),
     participant: r.one.participants({
-      from: r.campaignParticipants.participantId,
+      from: r.campaignApplications.participantId,
       to: r.participants.id,
     }),
   },

@@ -95,8 +95,8 @@ export const participants = pgTable(
   ]
 )
 
-export const campaignParticipants = pgTable(
-  "campaign_participants",
+export const campaignApplications = pgTable(
+  "campaign_applications",
   {
     code: text("code").notNull().unique(),
     voucher: text("voucher"),
@@ -113,10 +113,10 @@ export const campaignParticipants = pgTable(
       .defaultNow(),
   },
   (table) => [
-    uniqueIndex("campaign_participants_code_unique_idx").on(table.code),
+    uniqueIndex("campaign_applications_code_unique_idx").on(table.code),
     primaryKey({
       columns: [table.campaignId, table.participantId],
-      name: "campaign_participants_pkey",
+      name: "campaign_applications_pkey",
     }),
   ]
 )
