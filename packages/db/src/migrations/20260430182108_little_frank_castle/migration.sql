@@ -1,0 +1,1 @@
+ALTER TABLE "campaign_applications" ADD COLUMN "amount" numeric(10,2) NOT NULL;

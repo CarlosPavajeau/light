@@ -8,6 +8,7 @@ import {
   timestamp,
   uniqueIndex,
   primaryKey,
+  numeric,
 } from "drizzle-orm/pg-core"
 
 import { users } from "./auth"
@@ -102,6 +103,7 @@ export const campaignApplications = pgTable(
     voucher: text("voucher"),
     accountNumber: text("account_number"),
     attachedFile: text("attached_file"),
+    amount: numeric({ precision: 10, scale: 2 }).notNull(),
     campaignId: serial("campaign_id")
       .notNull()
       .references(() => campaigns.id),
