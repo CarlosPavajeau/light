@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@light/ui/components/dialog"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import type { inferRouterOutputs } from "@trpc/server"
 import { format, parseISO } from "date-fns"
 import { es } from "date-fns/locale"
@@ -47,6 +47,23 @@ export function ApplicationDetailsModal({
     ...trpc.participants.getById.queryOptions(participant?.participantId ?? 0),
     enabled: !!participant?.participantId,
   })
+
+  const { mutate: presignDownload, isPending } = useMutation({
+    ...trpc.external.presignDownload.mutationOptions(),
+    onSuccess: (result) => {
+      if (result.url) {
+        window.open(result.url, "_blank")
+      }
+    },
+  })
+
+  const handleDownload = () => {
+    if (!participant || !participant.attachedFile) {
+      return
+    }
+
+    presignDownload(participant.attachedFile)
+  }
 
   if (!participantData || !participant) {
     return null
@@ -111,7 +128,7 @@ export function ApplicationDetailsModal({
         </div>
 
         <DialogFooter showCloseButton>
-          <Button disabled>
+          <Button onClick={handleDownload} disabled={isPending}>
             Ver archivo adjunto
             <ExternalLinkIcon data-icon="inline-end" />
           </Button>
