@@ -18,6 +18,7 @@ import { Route as AuthedDashboardIndexRouteImport } from './routes/_authed/dashb
 import { Route as AuthedCampaignsIndexRouteImport } from './routes/_authed/campaigns.index'
 import { Route as ApiTrpcSplatRouteImport } from './routes/api/trpc/$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as AuthedDashboardUsersIndexRouteImport } from './routes/_authed/dashboard.users.index'
 import { Route as AuthedCampaignsCodeApplyRouteImport } from './routes/_authed/campaigns.$code.apply'
 import { Route as AuthedDashboardProjectsCodeIndexRouteImport } from './routes/_authed/dashboard.projects.$code.index'
 import { Route as AuthedDashboardProjectsCodeCCampaignCodeRouteImport } from './routes/_authed/dashboard.projects.$code.c.$campaignCode'
@@ -66,6 +67,12 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthedDashboardUsersIndexRoute =
+  AuthedDashboardUsersIndexRouteImport.update({
+    id: '/users/',
+    path: '/users/',
+    getParentRoute: () => AuthedDashboardRoute,
+  } as any)
 const AuthedCampaignsCodeApplyRoute =
   AuthedCampaignsCodeApplyRouteImport.update({
     id: '/campaigns/$code/apply',
@@ -95,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/campaigns/': typeof AuthedCampaignsIndexRoute
   '/dashboard/': typeof AuthedDashboardIndexRoute
   '/campaigns/$code/apply': typeof AuthedCampaignsCodeApplyRoute
+  '/dashboard/users/': typeof AuthedDashboardUsersIndexRoute
   '/dashboard/projects/$code/': typeof AuthedDashboardProjectsCodeIndexRoute
   '/dashboard/projects/$code/c/$campaignCode': typeof AuthedDashboardProjectsCodeCCampaignCodeRoute
 }
@@ -107,6 +115,7 @@ export interface FileRoutesByTo {
   '/campaigns': typeof AuthedCampaignsIndexRoute
   '/dashboard': typeof AuthedDashboardIndexRoute
   '/campaigns/$code/apply': typeof AuthedCampaignsCodeApplyRoute
+  '/dashboard/users': typeof AuthedDashboardUsersIndexRoute
   '/dashboard/projects/$code': typeof AuthedDashboardProjectsCodeIndexRoute
   '/dashboard/projects/$code/c/$campaignCode': typeof AuthedDashboardProjectsCodeCCampaignCodeRoute
 }
@@ -122,6 +131,7 @@ export interface FileRoutesById {
   '/_authed/campaigns/': typeof AuthedCampaignsIndexRoute
   '/_authed/dashboard/': typeof AuthedDashboardIndexRoute
   '/_authed/campaigns/$code/apply': typeof AuthedCampaignsCodeApplyRoute
+  '/_authed/dashboard/users/': typeof AuthedDashboardUsersIndexRoute
   '/_authed/dashboard/projects/$code/': typeof AuthedDashboardProjectsCodeIndexRoute
   '/_authed/dashboard/projects/$code/c/$campaignCode': typeof AuthedDashboardProjectsCodeCCampaignCodeRoute
 }
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/campaigns/'
     | '/dashboard/'
     | '/campaigns/$code/apply'
+    | '/dashboard/users/'
     | '/dashboard/projects/$code/'
     | '/dashboard/projects/$code/c/$campaignCode'
   fileRoutesByTo: FileRoutesByTo
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
     | '/campaigns'
     | '/dashboard'
     | '/campaigns/$code/apply'
+    | '/dashboard/users'
     | '/dashboard/projects/$code'
     | '/dashboard/projects/$code/c/$campaignCode'
   id:
@@ -163,6 +175,7 @@ export interface FileRouteTypes {
     | '/_authed/campaigns/'
     | '/_authed/dashboard/'
     | '/_authed/campaigns/$code/apply'
+    | '/_authed/dashboard/users/'
     | '/_authed/dashboard/projects/$code/'
     | '/_authed/dashboard/projects/$code/c/$campaignCode'
   fileRoutesById: FileRoutesById
@@ -241,6 +254,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authed/dashboard/users/': {
+      id: '/_authed/dashboard/users/'
+      path: '/users'
+      fullPath: '/dashboard/users/'
+      preLoaderRoute: typeof AuthedDashboardUsersIndexRouteImport
+      parentRoute: typeof AuthedDashboardRoute
+    }
     '/_authed/campaigns/$code/apply': {
       id: '/_authed/campaigns/$code/apply'
       path: '/campaigns/$code/apply'
@@ -267,12 +287,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthedDashboardRouteChildren {
   AuthedDashboardIndexRoute: typeof AuthedDashboardIndexRoute
+  AuthedDashboardUsersIndexRoute: typeof AuthedDashboardUsersIndexRoute
   AuthedDashboardProjectsCodeIndexRoute: typeof AuthedDashboardProjectsCodeIndexRoute
   AuthedDashboardProjectsCodeCCampaignCodeRoute: typeof AuthedDashboardProjectsCodeCCampaignCodeRoute
 }
 
 const AuthedDashboardRouteChildren: AuthedDashboardRouteChildren = {
   AuthedDashboardIndexRoute: AuthedDashboardIndexRoute,
+  AuthedDashboardUsersIndexRoute: AuthedDashboardUsersIndexRoute,
   AuthedDashboardProjectsCodeIndexRoute: AuthedDashboardProjectsCodeIndexRoute,
   AuthedDashboardProjectsCodeCCampaignCodeRoute:
     AuthedDashboardProjectsCodeCCampaignCodeRoute,
