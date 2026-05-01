@@ -11,5 +11,8 @@ export default defineConfig({
   resolve: {
     tsconfigPaths: true,
   },
+  ssr: {
+    noExternal: ["react", "react-dom"],
+  },
   plugins: [tailwindcss(), tanstackStart(), nitro(), viteReact()],
 })
