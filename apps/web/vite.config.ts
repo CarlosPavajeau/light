@@ -12,5 +12,10 @@ export default defineConfig({
     tsconfigPaths: true,
     dedupe: ["react", "react-dom"],
   },
-  plugins: [tailwindcss(), tanstackStart(), nitro(), viteReact()],
+  plugins: [
+    tailwindcss(),
+    tanstackStart(),
+    nitro({ noExternals: [/^@light\//] }),
+    viteReact(),
+  ],
 })
