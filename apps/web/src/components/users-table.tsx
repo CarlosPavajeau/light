@@ -6,10 +6,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@light/ui/components/dropdown-menu"
-import type { PaginationState } from "@tanstack/react-table"
+import { Input } from "@light/ui/components/input"
+import type { ColumnFiltersState, PaginationState } from "@tanstack/react-table"
 import {
   createColumnHelper,
   getCoreRowModel,
+  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
@@ -40,6 +42,9 @@ const columns = [
     ),
     header: "Usuario",
     id: "user",
+    filterFn: (row, _, value) =>
+      row.original.name.toLowerCase().includes(value.toLowerCase()) ||
+      row.original.email.toLowerCase().includes(value.toLowerCase()),
   }),
   columnHelper.accessor("role", {
     cell: ({ getValue }) => {
@@ -77,22 +82,35 @@ export function UsersTable({ users }: Props) {
     pageIndex: 0,
     pageSize: 10,
   })
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
   const table = useReactTable({
     columns,
     data: users,
     pageCount: Math.ceil(users.length / pagination.pageSize),
     getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onPaginationChange: setPagination,
+    onColumnFiltersChange: setColumnFilters,
     state: {
       pagination,
+      columnFilters,
     },
   })
 
   return (
     <div className="space-y-4">
+      <div className="max-w-md">
+        <Input
+          id="search-users"
+          placeholder="Buscar usuarios..."
+          onChange={(e) =>
+            table.setColumnFilters([{ id: "user", value: e.target.value }])
+          }
+        />
+      </div>
       <DataTable table={table} />
       <TablePagination table={table} />
     </div>
