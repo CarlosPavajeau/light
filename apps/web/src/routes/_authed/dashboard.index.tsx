@@ -1,4 +1,5 @@
 import { Button } from "@light/ui/components/button"
+import { Input } from "@light/ui/components/input"
 import {
   Item,
   ItemActions,
@@ -8,6 +9,7 @@ import {
 } from "@light/ui/components/item"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
+import { useMemo, useState } from "react"
 
 import { CreateProjectDialog } from "@/components/projects/create-dialog"
 import { useTRPC } from "@/utils/trpc"
@@ -19,8 +21,17 @@ export const Route = createFileRoute("/_authed/dashboard/")({
 function RouteComponent() {
   const { session } = Route.useRouteContext()
   const trpc = useTRPC()
+  const [search, setSearch] = useState("")
 
   const { data: projects } = useQuery(trpc.projects.list.queryOptions())
+
+  const filteredProjects = useMemo(
+    () =>
+      projects?.filter((project) =>
+        project.name.toLowerCase().includes(search.toLowerCase())
+      ),
+    [projects, search]
+  )
 
   return (
     <div className="space-y-6 sm:space-y-8">
@@ -28,10 +39,17 @@ function RouteComponent() {
         Bienvenido {session?.user.name}
       </h1>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-4">
         <CreateProjectDialog />
+        <Input
+          type="text"
+          placeholder="Buscar proyectos..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-fit"
+        />
         <ul className="flex flex-col gap-2">
-          {projects?.map((project) => (
+          {filteredProjects?.map((project) => (
             <li key={project.id}>
               <Item variant="outline">
                 <ItemContent>
