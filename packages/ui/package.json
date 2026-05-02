@@ -29,13 +29,9 @@
   },
   "devDependencies": {
     "@light/config": "workspace:*",
-    "@types/react": "^19.2.10",
-    "@types/react-dom": "^19.2.3",
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "tailwindcss": "^4.1.18",
     "typescript": "catalog:"
-  },
-  "peerDependencies": {
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5"
   }
 }

@@ -21,6 +21,7 @@ import {
 import { FolderIcon, UserIcon } from "lucide-react"
 
 export const Route = createFileRoute("/_authed/dashboard")({
+  ssr: false,
   beforeLoad: ({ context }) => {
     const { user } = context.session
 
