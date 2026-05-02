@@ -6,18 +6,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@light/ui/components/dropdown-menu"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@light/ui/components/table"
+import type { PaginationState } from "@tanstack/react-table"
 import {
   createColumnHelper,
-  flexRender,
   getCoreRowModel,
+  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
@@ -25,6 +18,8 @@ import type { UserWithRole } from "better-auth/plugins"
 import { MoreHorizontalIcon } from "lucide-react"
 import { useState } from "react"
 
+import { TablePagination } from "./data-table/pagination"
+import { DataTable } from "./data-table/table"
 import { ResetPasswordDialog } from "./users/reset-password-dialog"
 
 const columnHelper = createColumnHelper<UserWithRole>()
@@ -78,44 +73,28 @@ type Props = {
 }
 
 export function UsersTable({ users }: Props) {
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  })
+
   const table = useReactTable({
     columns,
     data: users,
+    pageCount: Math.ceil(users.length / pagination.pageSize),
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: setPagination,
+    state: {
+      pagination,
+    },
   })
 
   return (
     <div className="space-y-4">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((hg) => (
-            <TableRow key={hg.id}>
-              {hg.headers.map((header) => (
-                <TableHead key={header.id}>
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows.map((row) => (
-            <TableRow key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <DataTable table={table} />
+      <TablePagination table={table} />
     </div>
   )
 }
