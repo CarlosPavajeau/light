@@ -15,7 +15,17 @@ export default defineConfig({
   plugins: [
     tailwindcss(),
     tanstackStart(),
-    nitro({ noExternals: [/^@light\//] }),
+    nitro({
+      noExternals: [
+        /^@light\//,
+        "react",
+        "react-dom",
+        "react/jsx-runtime",
+        "react/jsx-dev-runtime",
+        "react-dom/server",
+        "react-dom/client",
+      ],
+    }),
     viteReact(),
   ],
 })
