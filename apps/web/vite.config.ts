@@ -16,15 +16,7 @@ export default defineConfig({
     tailwindcss(),
     tanstackStart(),
     nitro({
-      noExternals: [
-        /^@light\//,
-        "react",
-        "react-dom",
-        "react/jsx-runtime",
-        "react/jsx-dev-runtime",
-        "react-dom/server",
-        "react-dom/client",
-      ],
+      traceDeps: ["react", "react-dom"],
     }),
     viteReact(),
   ],
