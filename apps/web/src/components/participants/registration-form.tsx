@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
+import { createParticipantSchema } from "@light/api/schemas/participant"
 import { Button } from "@light/ui/components/button"
 import {
   Field,
@@ -10,6 +11,7 @@ import {
   FieldSet,
 } from "@light/ui/components/field"
 import { Input } from "@light/ui/components/input"
+import { PhoneInput } from "@light/ui/components/reui/phone-input"
 import {
   Select,
   SelectContent,
@@ -19,51 +21,17 @@ import {
 } from "@light/ui/components/select"
 import { Spinner } from "@light/ui/components/spinner"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useRouteContext } from "@tanstack/react-router"
+import { useEffect } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
-import z from "zod/v4"
 
-import { authClient } from "@/lib/auth-client"
 import { useTRPC } from "@/utils/trpc"
 
-const registrationSchema = z.object({
-  name: z.string().min(1, { message: "El nombre es requerido." }),
-  lastName: z.string().min(1, { message: "El apellido es requerido." }),
-  documentType: z.enum(["CC", "CE", "PT"]),
-  documentNumber: z
-    .string()
-    .min(1, { message: "El número de documento es requerido." }),
-  documentIssueDate: z
-    .string()
-    .min(1, { message: "La fecha de expedición es requerida." }),
-  documentExpirationDate: z.string().optional(),
-  documentIssuePlace: z
-    .string()
-    .min(1, { message: "El lugar de expedición es requerido." }),
-  birthDate: z
-    .string()
-    .min(1, { message: "La fecha de nacimiento es requerida." }),
-  birthPlace: z
-    .string()
-    .min(1, { message: "El lugar de nacimiento es requerido." }),
-  email: z.string().min(1, { message: "El correo electrónico es requerido." }),
-  telegramUsername: z.string().optional(),
-  phone: z.string().optional(),
-  residenceCountry: z
-    .string()
-    .min(1, { message: "El país de residencia es requerido." }),
-  residenceState: z
-    .string()
-    .min(1, { message: "El departamento es requerido." }),
-  residenceCity: z.string().min(1, { message: "La ciudad es requerida." }),
-  address: z.string().min(1, { message: "La dirección es requerida." }),
-  postalCode: z.string().optional(),
-})
-
-type RegistrationFormValues = z.infer<typeof registrationSchema>
-
 export function ParticipantRegistrationForm() {
-  const { data: session } = authClient.useSession()
+  const { session } = useRouteContext({
+    from: "/_authed",
+  })
   const trpc = useTRPC()
   const queryClient = useQueryClient()
 
@@ -71,8 +39,9 @@ export function ParticipantRegistrationForm() {
     control,
     handleSubmit,
     formState: { isSubmitting },
-  } = useForm<RegistrationFormValues>({
-    resolver: zodResolver(registrationSchema),
+    setValue,
+  } = useForm({
+    resolver: zodResolver(createParticipantSchema),
     defaultValues: {
       name: "",
       lastName: "",
@@ -94,6 +63,11 @@ export function ParticipantRegistrationForm() {
     },
   })
 
+  useEffect(() => {
+    setValue("userId", session.user.id)
+    setValue("email", session.user.email)
+  }, [setValue, session])
+
   const { mutateAsync } = useMutation({
     ...trpc.participants.create.mutationOptions(),
     onSuccess: async () => {
@@ -110,12 +84,7 @@ export function ParticipantRegistrationForm() {
   })
 
   const onSubmit = handleSubmit(async (data) => {
-    const userId = session?.user?.id
-    if (!userId) {
-      toast.error("No se pudo obtener la sesión del usuario.")
-      return
-    }
-    await mutateAsync({ ...data, userId })
+    await mutateAsync(data)
   })
 
   return (
@@ -334,13 +303,11 @@ export function ParticipantRegistrationForm() {
               name="phone"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>
-                    Teléfono (opcional)
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id={field.name}
-                    type="tel"
+                  <FieldLabel>Teléfono (opcional)</FieldLabel>
+                  <PhoneInput
+                    defaultCountry="CO"
+                    value={field.value ?? undefined}
+                    onChange={field.onChange}
                     aria-invalid={fieldState.invalid}
                   />
                   <FieldError errors={[fieldState.error]} />
