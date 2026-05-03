@@ -10,6 +10,7 @@ import {
 } from "@light/ui/components/empty"
 import {
   Field,
+  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -193,6 +194,9 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel>Comprobante de pago</FieldLabel>
                 <ImageUpload onFilesChange={handleFilesChange} />
+                <FieldDescription>
+                  Debes subir una imagen legible del comprobante de pago.
+                </FieldDescription>
                 <FieldError errors={[fieldState.error]} />
               </Field>
             )}
