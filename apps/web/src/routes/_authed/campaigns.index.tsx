@@ -6,6 +6,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@light/ui/components/empty"
+import { Input } from "@light/ui/components/input"
 import {
   Item,
   ItemActions,
@@ -16,6 +17,7 @@ import {
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { CompassIcon } from "lucide-react"
+import { useMemo, useState } from "react"
 
 import Header from "@/components/header"
 import { useTRPC } from "@/utils/trpc"
@@ -30,31 +32,18 @@ function RouteComponent() {
     trpc.campaigns.listActive.queryOptions()
   )
 
+  const [search, setSearch] = useState("")
+  const filteredCampaigns = useMemo(() => {
+    if (!campaigns) {
+      return []
+    }
+    return campaigns?.filter((campaign) =>
+      campaign.name.toLowerCase().includes(search.toLowerCase())
+    )
+  }, [campaigns, search])
+
   if (isLoading) {
     return <div>Cargando...</div>
-  }
-
-  if (!campaigns) {
-    return <div>No se encontraron campañas</div>
-  }
-
-  if (campaigns.length === 0) {
-    return (
-      <>
-        <Header />
-        <Empty>
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <CompassIcon />
-            </EmptyMedia>
-            <EmptyTitle>No hay campañas activas</EmptyTitle>
-            <EmptyDescription>
-              No hay campañas activas en este momento.
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
-      </>
-    )
   }
 
   return (
@@ -68,39 +57,66 @@ function RouteComponent() {
             </h1>
 
             <p className="text-sm text-muted-foreground">
-              {campaigns?.length} campañas activas
+              {filteredCampaigns.length} campañas activas
             </p>
           </div>
 
-          <ul className="flex flex-col gap-2">
-            {campaigns?.map((campaign) => (
-              <li key={campaign.id}>
-                <Item variant="outline">
-                  <ItemContent>
-                    <ItemTitle>
-                      {campaign.name} — {campaign.project?.name}
-                    </ItemTitle>
-                    {campaign.description && (
-                      <ItemDescription>{campaign.description}</ItemDescription>
-                    )}
-                  </ItemContent>
-                  <ItemActions>
-                    <Button
-                      render={
-                        <Link
-                          to="/campaigns/$code/apply"
-                          params={{ code: campaign.code }}
-                        />
-                      }
-                      nativeButton={false}
-                    >
-                      Aplicar
-                    </Button>
-                  </ItemActions>
-                </Item>
-              </li>
-            ))}
-          </ul>
+          <div className="flex flex-col gap-4">
+            <Input
+              type="text"
+              placeholder="Buscar campañas..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-fit"
+            />
+
+            {filteredCampaigns.length === 0 ? (
+              <Empty>
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <CompassIcon />
+                  </EmptyMedia>
+                  <EmptyTitle>No hay campañas activas</EmptyTitle>
+                  <EmptyDescription>
+                    No se encontraron campañas activas con el término "{search}
+                    ".
+                  </EmptyDescription>
+                </EmptyHeader>
+              </Empty>
+            ) : (
+              <ul className="flex flex-col gap-2">
+                {filteredCampaigns.map((campaign) => (
+                  <li key={campaign.id}>
+                    <Item variant="outline">
+                      <ItemContent>
+                        <ItemTitle>
+                          {campaign.name} — {campaign.project?.name}
+                        </ItemTitle>
+                        {campaign.description && (
+                          <ItemDescription>
+                            {campaign.description}
+                          </ItemDescription>
+                        )}
+                      </ItemContent>
+                      <ItemActions>
+                        <Button
+                          render={
+                            <Link
+                              to="/campaigns/$code/apply"
+                              params={{ code: campaign.code }}
+                            />
+                          }
+                          nativeButton={false}
+                        >
+                          Aplicar
+                        </Button>
+                      </ItemActions>
+                    </Item>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       </div>
     </>
