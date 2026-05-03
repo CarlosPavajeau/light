@@ -27,15 +27,15 @@
     "tailwind-merge": "^3.3.1",
     "tw-animate-css": "^1.3.4"
   },
-  "peerDependencies": {
-    "react": ">=19.0.0",
-    "react-dom": ">=19.0.0"
-  },
   "devDependencies": {
     "@light/config": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:",
     "tailwindcss": "^4.1.18",
     "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react": ">=19.0.0",
+    "react-dom": ">=19.0.0"
   }
 }
