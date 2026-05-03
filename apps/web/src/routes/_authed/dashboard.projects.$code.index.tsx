@@ -1,4 +1,5 @@
 import { Button } from "@light/ui/components/button"
+import { Input } from "@light/ui/components/input"
 import {
   Item,
   ItemActions,
@@ -8,6 +9,7 @@ import {
 } from "@light/ui/components/item"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
+import { useMemo, useState } from "react"
 
 import { CreateCampaignDialog } from "@/components/campaigns/create-dialog"
 import { useTRPC } from "@/utils/trpc"
@@ -25,13 +27,6 @@ function RouteComponent() {
     })
   )
 
-  const { data: campaigns } = useQuery({
-    ...trpc.campaigns.listByProject.queryOptions({
-      projectId: project?.id ?? 0,
-    }),
-    enabled: !!project?.id,
-  })
-
   if (isLoading) {
     return <span>Cargando...</span>
   }
@@ -41,7 +36,7 @@ function RouteComponent() {
   }
 
   return (
-    <div className="space-y-10 sm:space-y-12">
+    <div className="space-y-4 sm:space-y-8">
       <div className="flex flex-col gap-2">
         <Button
           variant="secondary"
@@ -65,41 +60,90 @@ function RouteComponent() {
         <div className="flex flex-col gap-2">
           <h2 className="font-medium">Campañas</h2>
           <CreateCampaignDialog projectId={project.id} />
-        </div>
 
-        <ul className="flex flex-col gap-2">
-          {campaigns?.map((campaign) => (
-            <li key={campaign.id}>
-              <Item variant="outline">
-                <ItemContent>
-                  <ItemTitle>{campaign.name}</ItemTitle>
-                  {campaign.description && (
-                    <ItemDescription>{campaign.description}</ItemDescription>
-                  )}
-                </ItemContent>
-                <ItemActions>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    render={
-                      <Link
-                        to="/dashboard/projects/$code/c/$campaignCode"
-                        params={{
-                          code: project.code,
-                          campaignCode: campaign.code,
-                        }}
-                      />
-                    }
-                    nativeButton={false}
-                  >
-                    Ver detalles
-                  </Button>
-                </ItemActions>
-              </Item>
-            </li>
-          ))}
-        </ul>
+          <CampaignsList projectId={project.id} />
+        </div>
       </div>
+    </div>
+  )
+}
+
+type CampaignsListProps = {
+  projectId: number
+}
+
+function CampaignsList({ projectId }: CampaignsListProps) {
+  const trpc = useTRPC()
+  const { code } = Route.useParams()
+  const { data: campaigns, isLoading } = useQuery({
+    ...trpc.campaigns.listByProject.queryOptions({
+      projectId,
+    }),
+  })
+
+  const [search, setSearch] = useState("")
+
+  const filteredCampaigns = useMemo(() => {
+    if (!campaigns) {
+      return []
+    }
+
+    return campaigns.filter((campaign) =>
+      campaign.name.toLowerCase().includes(search.toLowerCase())
+    )
+  }, [campaigns, search])
+
+  if (isLoading) {
+    return <span>Cargando campañas...</span>
+  }
+
+  if (!campaigns || campaigns.length === 0) {
+    return (
+      <span className="text-muted-foreground">No hay campañas registradas</span>
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      <Input
+        type="text"
+        placeholder="Buscar campañas..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="w-fit"
+      />
+      <ul className="flex flex-col gap-2">
+        {filteredCampaigns.map((campaign) => (
+          <li key={campaign.id}>
+            <Item variant="outline">
+              <ItemContent>
+                <ItemTitle>{campaign.name}</ItemTitle>
+                {campaign.description && (
+                  <ItemDescription>{campaign.description}</ItemDescription>
+                )}
+              </ItemContent>
+              <ItemActions>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  render={
+                    <Link
+                      to="/dashboard/projects/$code/c/$campaignCode"
+                      params={{
+                        code,
+                        campaignCode: campaign.code,
+                      }}
+                    />
+                  }
+                  nativeButton={false}
+                >
+                  Ver detalles
+                </Button>
+              </ItemActions>
+            </Item>
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }
