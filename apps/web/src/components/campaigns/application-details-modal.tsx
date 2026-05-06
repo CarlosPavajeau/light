@@ -126,6 +126,23 @@ export function ApplicationDetailsModal({
               value={application.accountNumber ?? "NA"}
             />
             <DetailRow
+              label="Tipo de cuenta"
+              value={application.accountType ?? "NA"}
+            />
+            <DetailRow label="Banco" value={application.bankName ?? "NA"} />
+            {application.swiftCode && (
+              <DetailRow label="Código SWIFT" value={application.swiftCode} />
+            )}
+            {application.wallet && (
+              <DetailRow label="Billetera" value={application.wallet} />
+            )}
+            {application.walletType && (
+              <DetailRow
+                label="Tipo de billetera"
+                value={application.walletType}
+              />
+            )}
+            <DetailRow
               label="Valor consignado"
               value={formatAmount(Number(application.amount))}
             />
