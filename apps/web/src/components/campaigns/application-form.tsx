@@ -16,6 +16,13 @@ import {
   FieldLabel,
 } from "@light/ui/components/field"
 import { Input } from "@light/ui/components/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@light/ui/components/select"
 import { Spinner } from "@light/ui/components/spinner"
 import type { FileWithPreview } from "@light/ui/hooks/use-file-upload"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
@@ -24,6 +31,7 @@ import { useCallback, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 
+import { accountTypes, bankNames, bankSwiftCodes } from "@/lib/constants"
 import { useTRPC, useTRPCClient } from "@/utils/trpc"
 
 import { ImageUpload } from "./image-upload"
@@ -60,6 +68,11 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
       participantId,
       voucher: "",
       accountNumber: "",
+      accountType: "",
+      bankName: "",
+      swiftCode: "",
+      wallet: "",
+      walletType: "",
       attachedFile: "",
       amount: "",
     },
@@ -169,6 +182,121 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
               </Field>
             )}
           />
+
+          <Controller
+            control={control}
+            name="accountType"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Tipo de cuenta</FieldLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger
+                    className="w-full"
+                    aria-invalid={fieldState.invalid}
+                  >
+                    <SelectValue placeholder="Selecciona un tipo de cuenta" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {accountTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FieldError errors={[fieldState.error]} />
+              </Field>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="bankName"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Banco</FieldLabel>
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => {
+                    field.onChange(value)
+                    if (value) {
+                      setValue("swiftCode", bankSwiftCodes[value] ?? "")
+                    }
+                  }}
+                >
+                  <SelectTrigger
+                    className="w-full"
+                    aria-invalid={fieldState.invalid}
+                  >
+                    <SelectValue placeholder="Selecciona un banco" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {bankNames.map((bank) => (
+                      <SelectItem key={bank} value={bank}>
+                        {bank}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FieldError errors={[fieldState.error]} />
+              </Field>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="swiftCode"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Código SWIFT</FieldLabel>
+                <Input
+                  {...field}
+                  id={field.name}
+                  type="text"
+                  aria-invalid={fieldState.invalid}
+                />
+                <FieldError errors={[fieldState.error]} />
+              </Field>
+            )}
+          />
+
+          <div className="grid grid-cols-2 gap-4">
+            <Controller
+              control={control}
+              name="wallet"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Billetera</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    type="text"
+                    aria-invalid={fieldState.invalid}
+                  />
+                  <FieldError errors={[fieldState.error]} />
+                </Field>
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="walletType"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>
+                    Tipo de billetera
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    type="text"
+                    aria-invalid={fieldState.invalid}
+                  />
+                  <FieldError errors={[fieldState.error]} />
+                </Field>
+              )}
+            />
+          </div>
 
           <Controller
             control={control}

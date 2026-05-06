@@ -107,6 +107,11 @@ export const campaignApplications = pgTable(
     code: text("code").notNull().unique(),
     voucher: text("voucher"),
     accountNumber: text("account_number"),
+    accountType: text("account_type"),
+    bankName: text("bank_name"),
+    swiftCode: text("swift_code"),
+    wallet: text("wallet"),
+    walletType: text("wallet_type"),
     attachedFile: text("attached_file"),
     amount: numeric({ precision: 10, scale: 2 }).notNull(),
     campaignId: serial("campaign_id")
