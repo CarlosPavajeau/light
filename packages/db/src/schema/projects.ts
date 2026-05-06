@@ -69,6 +69,10 @@ export const participants = pgTable(
     documentIssueDate: date("document_issue_date").notNull(),
     documentExpirationDate: date("document_expiration_date"),
     documentIssuePlace: text("document_issue_place").notNull(),
+    passportNumber: text("passport_number"),
+    passportIssueDate: date("passport_issue_date"),
+    passportExpirationDate: date("passport_expiration_date"),
+    passportIssuePlace: text("passport_issue_place"),
     birthDate: date("birth_date").notNull(),
     birthPlace: text("birth_place").notNull(),
     email: text().notNull(),
@@ -79,6 +83,7 @@ export const participants = pgTable(
     residenceCity: text("residence_city"),
     address: text("address"),
     postalCode: text("postal_code"),
+    leader: text("leader"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

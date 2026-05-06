@@ -24,6 +24,30 @@ export const createParticipantSchema = z
     documentIssuePlace: z
       .string()
       .min(1, "El lugar de expedición es requerido"),
+    passportNumber: z
+      .string()
+      .transform((val) => (val === "" ? undefined : val))
+      .pipe(
+        z
+          .string()
+          .regex(
+            /^[a-zA-Z0-9]+$/,
+            "El número de pasaporte solo puede contener letras y números"
+          )
+          .optional()
+      )
+      .optional(),
+    passportIssueDate: z
+      .string()
+      .transform((val) => (val === "" ? undefined : val))
+      .pipe(z.iso.date("Fecha de expedición inválida").optional())
+      .optional(),
+    passportExpirationDate: z
+      .string()
+      .transform((val) => (val === "" ? undefined : val))
+      .pipe(z.iso.date("Fecha de vencimiento inválida").optional())
+      .optional(),
+    passportIssuePlace: z.string().optional(),
     birthDate: z.iso
       .date("Fecha de nacimiento inválida")
       .refine(
@@ -64,9 +88,33 @@ export const createParticipantSchema = z
           .optional()
       )
       .optional(),
+    leader: z.string().optional(),
     userId: z.string(),
   })
   .superRefine((data, ctx) => {
+    if (data.passportNumber) {
+      if (!data.passportIssueDate) {
+        ctx.addIssue({
+          code: "custom",
+          message: "La fecha de expedición del pasaporte es requerida",
+          path: ["passportIssueDate"],
+        })
+      }
+      if (!data.passportExpirationDate) {
+        ctx.addIssue({
+          code: "custom",
+          message: "La fecha de vencimiento del pasaporte es requerida",
+          path: ["passportExpirationDate"],
+        })
+      }
+      if (!data.passportIssuePlace) {
+        ctx.addIssue({
+          code: "custom",
+          message: "El lugar de expedición del pasaporte es requerido",
+          path: ["passportIssuePlace"],
+        })
+      }
+    }
     if (
       data.documentExpirationDate &&
       data.documentExpirationDate <= data.documentIssueDate
@@ -76,6 +124,18 @@ export const createParticipantSchema = z
         message:
           "La fecha de vencimiento debe ser posterior a la fecha de expedición",
         path: ["documentExpirationDate"],
+      })
+    }
+    if (
+      data.passportExpirationDate &&
+      data.passportIssueDate &&
+      data.passportExpirationDate <= data.passportIssueDate
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        message:
+          "La fecha de vencimiento debe ser posterior a la fecha de expedición",
+        path: ["passportExpirationDate"],
       })
     }
   })

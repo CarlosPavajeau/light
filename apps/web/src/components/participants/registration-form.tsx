@@ -50,6 +50,10 @@ export function ParticipantRegistrationForm() {
       documentIssueDate: "",
       documentExpirationDate: "",
       documentIssuePlace: "",
+      passportNumber: "",
+      passportIssueDate: "",
+      passportExpirationDate: "",
+      passportIssuePlace: "",
       birthDate: "",
       birthPlace: "",
       email: "",
@@ -60,6 +64,7 @@ export function ParticipantRegistrationForm() {
       residenceCity: "",
       address: "",
       postalCode: "",
+      leader: "",
     },
   })
 
@@ -259,6 +264,92 @@ export function ParticipantRegistrationForm() {
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>
                       Fecha de vencimiento (opcional)
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      type="date"
+                      aria-invalid={fieldState.invalid}
+                    />
+                    <FieldError errors={[fieldState.error]} />
+                  </Field>
+                )}
+              />
+            </div>
+          </FieldGroup>
+        </FieldSet>
+
+        <FieldSeparator />
+        <FieldSet>
+          <FieldLegend>Pasaporte (opcional)</FieldLegend>
+          <FieldGroup>
+            <div className="grid grid-cols-2 gap-4">
+              <Controller
+                control={control}
+                name="passportNumber"
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>
+                      Número de pasaporte
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      type="text"
+                      aria-invalid={fieldState.invalid}
+                    />
+                    <FieldError errors={[fieldState.error]} />
+                  </Field>
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="passportIssuePlace"
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>
+                      Lugar de expedición
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      type="text"
+                      aria-invalid={fieldState.invalid}
+                    />
+                    <FieldError errors={[fieldState.error]} />
+                  </Field>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <Controller
+                control={control}
+                name="passportIssueDate"
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>
+                      Fecha de expedición
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      type="date"
+                      aria-invalid={fieldState.invalid}
+                    />
+                    <FieldError errors={[fieldState.error]} />
+                  </Field>
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="passportExpirationDate"
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>
+                      Fecha de vencimiento
                     </FieldLabel>
                     <Input
                       {...field}
