@@ -50,7 +50,7 @@ export function ApplicationDetailsModal({
   application,
 }: Props) {
   const trpc = useTRPC()
-  const { data: participantData } = useQuery({
+  const { data: participant } = useQuery({
     ...trpc.participants.getById.queryOptions(application?.participantId ?? 0),
     enabled: !!application?.participantId,
   })
@@ -72,7 +72,7 @@ export function ApplicationDetailsModal({
     presignDownload(application.attachedFile)
   }
 
-  if (!participantData || !application) {
+  if (!participant || !application) {
     return null
   }
 
@@ -89,35 +89,35 @@ export function ApplicationDetailsModal({
           <dl className="flex flex-col gap-3">
             <DetailRow
               label="Documento"
-              value={`${participantData.documentType} - ${participantData.documentNumber}`}
-              subvalue={`Expedido: ${formatDate(participantData.documentIssueDate)} en ${participantData.documentIssuePlace}`}
+              value={`${participant.documentType} - ${participant.documentNumber}`}
+              subvalue={`Expedido: ${formatDate(participant.documentIssueDate)} en ${participant.documentIssuePlace}`}
             />
-            {participantData.documentExpirationDate && (
+            {participant.documentExpirationDate && (
               <DetailRow
                 label="Vencimiento documento"
-                value={formatDate(participantData.documentExpirationDate)}
+                value={formatDate(participant.documentExpirationDate)}
               />
             )}
             <DetailRow label="Nombre" value={name} />
-            <DetailRow label="Email" value={participantData.email} />
-            {participantData.phone && (
-              <DetailRow label="Teléfono" value={participantData.phone} />
+            <DetailRow label="Email" value={participant.email} />
+            {participant.phone && (
+              <DetailRow label="Teléfono" value={participant.phone} />
             )}
-            {participantData.telegramUsername && (
+            {participant.telegramUsername && (
               <DetailRow
                 label="Telegram"
-                value={participantData.telegramUsername}
+                value={participant.telegramUsername}
               />
             )}
             <DetailRow
               label="Fecha de nacimiento"
-              value={formatDate(participantData.birthDate)}
-              subvalue={`Lugar: ${participantData.birthPlace}`}
+              value={formatDate(participant.birthDate)}
+              subvalue={`Lugar: ${participant.birthPlace}`}
             />
             <DetailRow
               label="Residencia"
-              value={`${participantData.residenceCity}, ${participantData.residenceState}, ${participantData.residenceCountry}`}
-              subvalue={`${participantData.address}${participantData.postalCode ? ` - CP ${participantData.postalCode}` : ""}`}
+              value={`${participant.residenceCity}, ${participant.residenceState}, ${participant.residenceCountry}`}
+              subvalue={`${participant.address}${participant.postalCode ? ` - CP ${participant.postalCode}` : ""}`}
             />
 
             <DetailRow label="Voucher" value={application.voucher ?? "NA"} />
