@@ -16,7 +16,8 @@ import {
 } from "@light/ui/components/field"
 import { Input } from "@light/ui/components/input"
 import { Textarea } from "@light/ui/components/textarea"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation } from "@tanstack/react-query"
+import { useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -36,7 +37,6 @@ export function CreateProjectDialog() {
   const {
     control,
     handleSubmit,
-    reset,
     formState: { isSubmitting },
   } = useForm({
     resolver: zodResolver(schema),
@@ -47,16 +47,15 @@ export function CreateProjectDialog() {
   })
 
   const trpc = useTRPC()
-  const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const { mutateAsync } = useMutation({
     ...trpc.projects.create.mutationOptions(),
-    onSuccess: async () => {
+    onSuccess: (data) => {
       toast.success("Proyecto creado exitosamente")
-      await queryClient.invalidateQueries({
-        queryKey: trpc.projects.list.queryKey(),
+      navigate({
+        to: "/dashboard/projects/$code",
+        params: { code: data.code },
       })
-      reset()
-      setOpen(false)
     },
   })
 
