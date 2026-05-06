@@ -14,7 +14,7 @@ const schema = z.object({
 
 export const projectsRouter = router({
   create: protectedProcedure.input(schema).mutation(async ({ input }) => {
-    const project = await db
+    const [project] = await db
       .insert(projects)
       .values({
         name: input.name,
