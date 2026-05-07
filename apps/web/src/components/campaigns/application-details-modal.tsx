@@ -85,7 +85,7 @@ export function ApplicationDetailsModal({
           <DialogTitle>Detalles de la aplicación</DialogTitle>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="-mx-4 max-h-[70vh] overflow-y-auto px-4">
           <dl className="flex flex-col gap-3">
             <DetailRow
               label="Documento"
