@@ -46,7 +46,7 @@ export function TablePagination<T>({ table }: Props<T>) {
       </Field>
       <Pagination className="mx-0 w-auto">
         <PaginationContent>
-          <PaginationItem onClick={table.previousPage}>
+          <PaginationItem>
             <PaginationPrevious
               aria-disabled={!table.getCanPreviousPage()}
               className={
