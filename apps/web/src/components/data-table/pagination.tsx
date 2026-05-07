@@ -22,7 +22,7 @@ type Props<T = unknown> = {
 
 export function TablePagination<T>({ table }: Props<T>) {
   return (
-    <div className="flex items-center justify-between gap-4">
+    <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
       <Field className="w-fit" orientation="horizontal">
         <FieldLabel htmlFor="select-rows-per-page">
           Elementos por página

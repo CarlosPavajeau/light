@@ -38,7 +38,7 @@ function RouteComponent() {
     <SidebarProvider>
       <AppSidebar />
 
-      <SidebarInset>
+      <SidebarInset className="min-w-0">
         <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center border-b border-border bg-background/75 backdrop-blur-xl">
           <nav
             aria-label="Navegacion principal"
