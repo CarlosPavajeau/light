@@ -17,6 +17,13 @@ import {
 } from "@light/ui/components/field"
 import { Input } from "@light/ui/components/input"
 import {
+  Autocomplete,
+  AutocompleteContent,
+  AutocompleteInput,
+  AutocompleteItem,
+  AutocompleteList,
+} from "@light/ui/components/reui/autocomplete"
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -215,7 +222,8 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel>Banco</FieldLabel>
-                <Select
+                <Autocomplete
+                  items={bankNames}
                   value={field.value}
                   onValueChange={(value) => {
                     field.onChange(value)
@@ -224,20 +232,17 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
                     }
                   }}
                 >
-                  <SelectTrigger
-                    className="w-full"
-                    aria-invalid={fieldState.invalid}
-                  >
-                    <SelectValue placeholder="Selecciona un banco" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {bankNames.map((bank) => (
-                      <SelectItem key={bank} value={bank}>
-                        {bank}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  <AutocompleteInput showTrigger showClear />
+                  <AutocompleteContent>
+                    <AutocompleteList>
+                      {(item) => (
+                        <AutocompleteItem key={item} value={item}>
+                          {item}
+                        </AutocompleteItem>
+                      )}
+                    </AutocompleteList>
+                  </AutocompleteContent>
+                </Autocomplete>
                 <FieldError errors={[fieldState.error]} />
               </Field>
             )}
