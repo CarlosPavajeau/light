@@ -11,6 +11,7 @@ import { createFileRoute } from "@tanstack/react-router"
 import { UserIcon } from "lucide-react"
 
 import { UsersTable } from "@/components/users-table"
+import { CreateUserDialog } from "@/components/users/create-user-dialog"
 import { authClient } from "@/lib/auth-client"
 
 export const Route = createFileRoute("/_authed/dashboard/users/")({
@@ -52,11 +53,15 @@ function RouteComponent() {
 
   return (
     <div className="space-y-6 sm:space-y-8">
-      <div>
-        <h1 className="text-xl font-semibold">Usuarios</h1>
-        <p className="text-sm text-muted-foreground">
-          {total} {total === 1 ? "usuario" : "usuarios"} en total
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-semibold">Usuarios</h1>
+          <p className="text-sm text-muted-foreground">
+            {total} {total === 1 ? "usuario" : "usuarios"} en total
+          </p>
+        </div>
+
+        <CreateUserDialog />
       </div>
 
       <UsersTable users={users} />
