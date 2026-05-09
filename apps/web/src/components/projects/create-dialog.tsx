@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
+import { createProjectSchema } from "@light/api/schemas/projects"
 import { Button } from "@light/ui/components/button"
 import {
   Dialog,
@@ -21,16 +22,8 @@ import { useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
-import z from "zod/v4"
 
 import { useTRPC } from "@/utils/trpc"
-
-const schema = z.object({
-  name: z
-    .string()
-    .min(3, { message: "El nombre debe tener al menos 3 caracteres" }),
-  description: z.string().optional(),
-})
 
 export function CreateProjectDialog() {
   const [open, setOpen] = useState(false)
@@ -39,7 +32,7 @@ export function CreateProjectDialog() {
     handleSubmit,
     formState: { isSubmitting },
   } = useForm({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(createProjectSchema),
     defaultValues: {
       name: "",
       description: "",

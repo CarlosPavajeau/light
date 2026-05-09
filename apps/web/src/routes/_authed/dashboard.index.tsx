@@ -1,12 +1,12 @@
 import { Button } from "@light/ui/components/button"
-import { Input } from "@light/ui/components/input"
 import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemDescription,
-  ItemTitle,
-} from "@light/ui/components/item"
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@light/ui/components/card"
+import { Input } from "@light/ui/components/input"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useMemo, useState } from "react"
@@ -36,7 +36,7 @@ function RouteComponent() {
   return (
     <div className="space-y-6 sm:space-y-8">
       <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
-        Bienvenido {session?.user.name}
+        Bienvenido {session.user.name}
       </h1>
 
       <div className="flex flex-col gap-4">
@@ -51,15 +51,16 @@ function RouteComponent() {
         <ul className="flex flex-col gap-2">
           {filteredProjects?.map((project) => (
             <li key={project.id}>
-              <Item variant="outline">
-                <ItemContent>
-                  <ItemTitle>{project.name}</ItemTitle>
-                  <ItemDescription>{project.description}</ItemDescription>
-                </ItemContent>
-                <ItemActions>
+              <Card>
+                <CardHeader>
+                  <CardTitle>{project.name}</CardTitle>
+                  {project.description && (
+                    <CardDescription>{project.description}</CardDescription>
+                  )}
+                </CardHeader>
+
+                <CardFooter className="gap-2">
                   <Button
-                    variant="outline"
-                    size="sm"
                     render={
                       <Link
                         to="/dashboard/projects/$code"
@@ -70,8 +71,10 @@ function RouteComponent() {
                   >
                     Ver detalles
                   </Button>
-                </ItemActions>
-              </Item>
+
+                  <Button variant="outline">Editar</Button>
+                </CardFooter>
+              </Card>
             </li>
           ))}
         </ul>
