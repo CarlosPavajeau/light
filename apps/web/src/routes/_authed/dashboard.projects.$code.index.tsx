@@ -1,12 +1,12 @@
 import { Button } from "@light/ui/components/button"
-import { Input } from "@light/ui/components/input"
 import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemDescription,
-  ItemTitle,
-} from "@light/ui/components/item"
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from "@light/ui/components/card"
+import { Input } from "@light/ui/components/input"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useMemo, useState } from "react"
@@ -115,14 +115,15 @@ function CampaignsList({ projectId }: CampaignsListProps) {
       <ul className="flex flex-col gap-2">
         {filteredCampaigns.map((campaign) => (
           <li key={campaign.id}>
-            <Item variant="outline">
-              <ItemContent>
-                <ItemTitle>{campaign.name}</ItemTitle>
+            <Card>
+              <CardHeader>
+                <CardTitle>{campaign.name}</CardTitle>
                 {campaign.description && (
-                  <ItemDescription>{campaign.description}</ItemDescription>
+                  <CardDescription>{campaign.description}</CardDescription>
                 )}
-              </ItemContent>
-              <ItemActions>
+              </CardHeader>
+
+              <CardFooter>
                 <Button
                   variant="outline"
                   size="sm"
@@ -139,8 +140,8 @@ function CampaignsList({ projectId }: CampaignsListProps) {
                 >
                   Ver detalles
                 </Button>
-              </ItemActions>
-            </Item>
+              </CardFooter>
+            </Card>
           </li>
         ))}
       </ul>
