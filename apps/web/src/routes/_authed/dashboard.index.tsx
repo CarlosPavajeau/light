@@ -12,6 +12,7 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { useMemo, useState } from "react"
 
 import { CreateProjectDialog } from "@/components/projects/create-dialog"
+import { UpdateProjectDialog } from "@/components/projects/update-dialog"
 import { useTRPC } from "@/utils/trpc"
 
 export const Route = createFileRoute("/_authed/dashboard/")({
@@ -72,7 +73,7 @@ function RouteComponent() {
                     Ver detalles
                   </Button>
 
-                  <Button variant="outline">Editar</Button>
+                  <UpdateProjectDialog project={project} />
                 </CardFooter>
               </Card>
             </li>
