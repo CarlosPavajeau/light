@@ -78,7 +78,7 @@ export function UpdateProjectDialog({ project }: Props) {
           <DialogTitle>Agregar proyecto</DialogTitle>
         </DialogHeader>
 
-        <form id="create-project-form" onSubmit={onSubmit}>
+        <form id="update-project-form" onSubmit={onSubmit}>
           <FieldGroup>
             <Controller
               control={control}
@@ -123,7 +123,7 @@ export function UpdateProjectDialog({ project }: Props) {
         <DialogFooter showCloseButton>
           <Button
             type="submit"
-            form="create-project-form"
+            form="update-project-form"
             disabled={isSubmitting}
           >
             Actualizar proyecto
