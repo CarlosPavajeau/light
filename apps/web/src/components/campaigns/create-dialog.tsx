@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
+import { createCampaignSchema } from "@light/api/schemas/campaigns"
 import { Button } from "@light/ui/components/button"
 import {
   Dialog,
@@ -20,17 +21,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
-import z from "zod/v4"
 
 import { useTRPC } from "@/utils/trpc"
-
-const schema = z.object({
-  name: z
-    .string()
-    .min(3, { message: "El nombre debe tener al menos 3 caracteres" }),
-  description: z.string().optional(),
-  projectId: z.number(),
-})
 
 type Props = {
   projectId: number
@@ -44,7 +36,7 @@ export function CreateCampaignDialog({ projectId }: Props) {
     reset,
     formState: { isSubmitting },
   } = useForm({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(createCampaignSchema),
     defaultValues: {
       name: "",
       description: "",
