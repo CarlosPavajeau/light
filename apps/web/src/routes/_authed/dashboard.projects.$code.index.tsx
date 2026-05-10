@@ -12,6 +12,7 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { useMemo, useState } from "react"
 
 import { CreateCampaignDialog } from "@/components/campaigns/create-dialog"
+import { UpdateCampaignDialog } from "@/components/campaigns/update-dialog"
 import { useTRPC } from "@/utils/trpc"
 
 export const Route = createFileRoute("/_authed/dashboard/projects/$code/")({
@@ -123,10 +124,8 @@ function CampaignsList({ projectId }: CampaignsListProps) {
                 )}
               </CardHeader>
 
-              <CardFooter>
+              <CardFooter className="gap-2">
                 <Button
-                  variant="outline"
-                  size="sm"
                   render={
                     <Link
                       to="/dashboard/projects/$code/c/$campaignCode"
@@ -140,6 +139,11 @@ function CampaignsList({ projectId }: CampaignsListProps) {
                 >
                   Ver detalles
                 </Button>
+
+                <UpdateCampaignDialog
+                  campaign={campaign}
+                  projectId={projectId}
+                />
               </CardFooter>
             </Card>
           </li>
