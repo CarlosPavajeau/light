@@ -1,4 +1,5 @@
 import { db } from "@light/db"
+import { updateCampaign } from "@light/db/queries/campaigns"
 import { campaignApplications, campaigns } from "@light/db/schema/projects"
 import { z } from "zod/v4"
 
@@ -7,6 +8,7 @@ import { newId } from "../lib/uid"
 import {
   addApplicationSchema,
   createCampaignSchema,
+  updateCampaignSchema,
 } from "../schemas/campaigns"
 
 export const campaignsRouter = router({
@@ -109,6 +111,14 @@ export const campaignsRouter = router({
           },
         },
       })
+
+      return response
+    }),
+
+  update: protectedProcedure
+    .input(updateCampaignSchema)
+    .mutation(async ({ input }) => {
+      const response = await updateCampaign(input)
 
       return response
     }),

@@ -8,6 +8,14 @@ export const createCampaignSchema = z.object({
   projectId: z.number(),
 })
 
+export const updateCampaignSchema = z.object({
+  id: z.number(),
+  name: z
+    .string()
+    .min(3, { error: "El nombre debe tener al menos 3 caracteres" }),
+  description: z.string().optional(),
+})
+
 export const addApplicationSchema = z.object({
   campaignId: z.number(),
   participantId: z.number(),
