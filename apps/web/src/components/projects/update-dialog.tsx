@@ -51,9 +51,7 @@ export function UpdateProjectDialog({ project }: Props) {
     ...trpc.projects.update.mutationOptions(),
     onSuccess: async () => {
       toast.success("Proyecto actualizado exitosamente")
-      await queryClient.invalidateQueries({
-        queryKey: trpc.projects.list.queryKey(),
-      })
+      await queryClient.invalidateQueries(trpc.projects.list.queryOptions())
       setOpen(false)
     },
   })
