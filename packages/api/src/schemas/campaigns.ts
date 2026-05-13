@@ -14,6 +14,7 @@ export const updateCampaignSchema = z.object({
     .string()
     .min(3, { error: "El nombre debe tener al menos 3 caracteres" }),
   description: z.string().optional(),
+  isActive: z.boolean(),
 })
 
 export const addApplicationSchema = z.object({

@@ -7,6 +7,7 @@ type UpdateCampaignParams = {
   id: number
   name: string
   description?: string
+  isActive: boolean
 }
 
 export async function updateCampaign(campaign: UpdateCampaignParams) {

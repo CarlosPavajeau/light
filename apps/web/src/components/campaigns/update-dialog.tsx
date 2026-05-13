@@ -17,6 +17,7 @@ import {
   FieldLabel,
 } from "@light/ui/components/field"
 import { Input } from "@light/ui/components/input"
+import { Switch } from "@light/ui/components/switch"
 import { Textarea } from "@light/ui/components/textarea"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import type { inferRouterOutputs } from "@trpc/server"
@@ -43,6 +44,7 @@ export function UpdateCampaignDialog({ campaign, projectId }: Props) {
       id: campaign.id,
       name: campaign.name,
       description: campaign.description ?? undefined,
+      isActive: campaign.isActive,
     },
   })
 
@@ -115,6 +117,28 @@ export function UpdateCampaignDialog({ campaign, projectId }: Props) {
                     autoComplete="off"
                     aria-invalid={fieldState.invalid}
                     {...field}
+                  />
+                  <FieldError errors={[fieldState.error]} />
+                </Field>
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="isActive"
+              render={({ field, fieldState }) => (
+                <Field
+                  orientation="horizontal"
+                  className="w-fit"
+                  data-invalid={fieldState.invalid}
+                >
+                  <FieldLabel htmlFor={field.name}>Campaña activa</FieldLabel>
+                  <Switch
+                    id={field.name}
+                    name={field.name}
+                    aria-invalid={fieldState.invalid}
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
                   />
                   <FieldError errors={[fieldState.error]} />
                 </Field>
