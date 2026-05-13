@@ -1,3 +1,4 @@
+import { Badge } from "@light/ui/components/badge"
 import { Button } from "@light/ui/components/button"
 import {
   Card,
@@ -118,7 +119,10 @@ function CampaignsList({ projectId }: CampaignsListProps) {
           <li key={campaign.id}>
             <Card>
               <CardHeader>
-                <CardTitle>{campaign.name}</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  {campaign.name}
+                  <Badge>{campaign.isActive ? "Activa" : "Inactiva"}</Badge>
+                </CardTitle>
                 {campaign.description && (
                   <CardDescription>{campaign.description}</CardDescription>
                 )}
