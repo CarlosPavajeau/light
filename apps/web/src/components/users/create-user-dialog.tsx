@@ -172,9 +172,7 @@ export function CreateUserDialog() {
               name="password"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>
-                    Contraseña
-                  </FieldLabel>
+                  <FieldLabel htmlFor={field.name}>Contraseña</FieldLabel>
 
                   <InputGroup>
                     <InputGroupInput
