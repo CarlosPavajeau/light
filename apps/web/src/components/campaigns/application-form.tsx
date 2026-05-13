@@ -1,13 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { addApplicationSchema } from "@light/api/schemas/campaigns"
+import { Alert, AlertDescription, AlertTitle } from "@light/ui/components/alert"
 import { Button } from "@light/ui/components/button"
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@light/ui/components/empty"
 import {
   Field,
   FieldDescription,
@@ -33,7 +27,9 @@ import {
 import { Spinner } from "@light/ui/components/spinner"
 import type { FileWithPreview } from "@light/ui/hooks/use-file-upload"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { FolderIcon } from "lucide-react"
+import { format } from "date-fns"
+import { es } from "date-fns/locale"
+import { ExternalLinkIcon } from "lucide-react"
 import { useCallback, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -41,7 +37,19 @@ import { toast } from "sonner"
 import { accountTypes, bankNames, bankSwiftCodes } from "@/lib/constants"
 import { useTRPC, useTRPCClient } from "@/utils/trpc"
 
+import { DetailRow } from "../detail-row"
 import { ImageUpload } from "./image-upload"
+
+const formatAmount = (value: string | null | undefined) => {
+  if (!value) {
+    return "NA"
+  }
+  const num = Number(value)
+  if (Number.isNaN(num)) {
+    return value
+  }
+  return num.toLocaleString("es-ES", { style: "currency", currency: "COP" })
+}
 
 type Props = {
   campaignId: number
@@ -146,6 +154,17 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
       setValue("attachedFile", "selected", { shouldValidate: true })
     },
     [setValue]
+  )
+
+  const { mutate: presignDownload, isPending: isDownloadPending } = useMutation(
+    {
+      ...trpc.external.presignDownload.mutationOptions(),
+      onSuccess: (result) => {
+        if (result.url) {
+          window.open(result.url, "_blank")
+        }
+      },
+    }
   )
 
   if (isLoading) {
@@ -350,16 +369,57 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
   }
 
   return (
-    <Empty>
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <FolderIcon />
-        </EmptyMedia>
-        <EmptyTitle>Aplicación enviada</EmptyTitle>
-        <EmptyDescription>
-          Ya tiene una aplicación en esta campaña
-        </EmptyDescription>
-      </EmptyHeader>
-    </Empty>
+    <div className="flex flex-col gap-4">
+      <Alert>
+        <AlertTitle>Ya aplicaste a esta campaña</AlertTitle>
+        <AlertDescription>
+          Aquí están los datos de tu aplicación registrada.
+        </AlertDescription>
+      </Alert>
+
+      <dl className="flex flex-col gap-3">
+        <DetailRow label="Voucher" value={application.voucher ?? "NA"} />
+        <DetailRow
+          label="Número de cuenta"
+          value={application.accountNumber ?? "NA"}
+        />
+        <DetailRow
+          label="Tipo de cuenta"
+          value={application.accountType ?? "NA"}
+        />
+        <DetailRow label="Banco" value={application.bankName ?? "NA"} />
+        {application.swiftCode && (
+          <DetailRow label="Código SWIFT" value={application.swiftCode} />
+        )}
+        {application.wallet && (
+          <DetailRow label="Billetera" value={application.wallet} />
+        )}
+        {application.walletType && (
+          <DetailRow label="Tipo de billetera" value={application.walletType} />
+        )}
+        <DetailRow
+          label="Valor consignado"
+          value={formatAmount(application.amount)}
+        />
+        <DetailRow
+          label="Fecha de aplicación"
+          value={format(application.createdAt, "dd/MM/yyyy HH:mm a", {
+            locale: es,
+          })}
+        />
+      </dl>
+
+      {application.attachedFile && (
+        <Button
+          variant="outline"
+          onClick={() => presignDownload(application.attachedFile ?? "")}
+          disabled={isDownloadPending}
+        >
+          {isDownloadPending && <Spinner />}
+          Ver archivo adjunto
+          <ExternalLinkIcon data-icon="inline-end" />
+        </Button>
+      )}
+    </div>
   )
 }
