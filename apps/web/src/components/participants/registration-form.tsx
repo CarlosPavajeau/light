@@ -256,25 +256,6 @@ export function ParticipantRegistrationForm() {
                   </Field>
                 )}
               />
-
-              <Controller
-                control={control}
-                name="documentExpirationDate"
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Fecha de vencimiento (opcional)
-                    </FieldLabel>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      type="date"
-                      aria-invalid={fieldState.invalid}
-                    />
-                    <FieldError errors={[fieldState.error]} />
-                  </Field>
-                )}
-              />
             </div>
           </FieldGroup>
         </FieldSet>
