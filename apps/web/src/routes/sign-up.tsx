@@ -29,9 +29,12 @@ export const Route = createFileRoute("/sign-up")({
 })
 
 const signUpSchema = z.object({
-  name: z.string().min(3, {
-    message: "Por favor, ingresa tu nombre.",
-  }),
+  name: z
+    .string()
+    .min(3, {
+      message: "Por favor, ingresa tu nombre.",
+    })
+    .transform((name) => name.trim().toUpperCase()),
   email: z.email({
     message: "Por favor, ingresa un correo electrónico válido.",
   }),
