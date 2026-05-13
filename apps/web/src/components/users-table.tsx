@@ -31,7 +31,7 @@ const columns = [
     cell: ({ row }) => (
       <div className="flex items-center gap-3">
         <div className="min-w-0">
-          <p className="truncate leading-none font-medium">
+          <p className="truncate leading-none font-medium uppercase">
             {row.original.name}
           </p>
           <p className="mt-0.5 truncate text-xs text-muted-foreground">
