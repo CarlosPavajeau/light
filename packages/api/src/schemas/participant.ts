@@ -4,8 +4,14 @@ const today = () => new Date().toISOString().slice(0, 10)
 
 export const createParticipantSchema = z
   .object({
-    name: z.string().min(1, "El nombre es requerido"),
-    lastName: z.string().min(1, "El apellido es requerido"),
+    name: z
+      .string()
+      .min(1, "El nombre es requerido")
+      .transform((value) => value.trim().toUpperCase()),
+    lastName: z
+      .string()
+      .min(1, "El apellido es requerido")
+      .transform((value) => value.trim().toUpperCase()),
     documentType: z.enum(["CC", "CE", "PT"]),
     documentNumber: z
       .string()
