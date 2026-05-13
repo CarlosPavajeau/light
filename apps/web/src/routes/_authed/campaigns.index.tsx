@@ -1,3 +1,4 @@
+import { Badge } from "@light/ui/components/badge"
 import { Button } from "@light/ui/components/button"
 import {
   Empty,
@@ -14,6 +15,13 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@light/ui/components/item"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@light/ui/components/select"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { CompassIcon } from "lucide-react"
@@ -33,14 +41,31 @@ function RouteComponent() {
   )
 
   const [search, setSearch] = useState("")
+  const [selectedProject, setSelectedProject] = useState<string>("all")
+
+  const projects = useMemo(() => {
+    if (!campaigns) {
+      return []
+    }
+    const names = campaigns
+      .map((c) => c.project?.name)
+      .filter((name): name is string => name !== undefined)
+    return [...new Set(names)].toSorted()
+  }, [campaigns])
+
   const filteredCampaigns = useMemo(() => {
     if (!campaigns) {
       return []
     }
-    return campaigns?.filter((campaign) =>
-      campaign.name.toLowerCase().includes(search.toLowerCase())
-    )
-  }, [campaigns, search])
+    return campaigns.filter((campaign) => {
+      const matchesSearch = campaign.name
+        .toLowerCase()
+        .includes(search.toLowerCase())
+      const matchesProject =
+        selectedProject === "all" || campaign.project?.name === selectedProject
+      return matchesSearch && matchesProject
+    })
+  }, [campaigns, search, selectedProject])
 
   if (isLoading) {
     return <div>Cargando...</div>
@@ -62,13 +87,35 @@ function RouteComponent() {
           </div>
 
           <div className="flex flex-col gap-4">
-            <Input
-              type="text"
-              placeholder="Buscar campañas..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-fit"
-            />
+            <div className="flex flex-wrap gap-2">
+              <Input
+                type="text"
+                placeholder="Buscar campañas..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-fit"
+              />
+              <Select
+                value={selectedProject}
+                onValueChange={(value) => setSelectedProject(value ?? "all")}
+              >
+                <SelectTrigger className="min-w-48">
+                  <SelectValue>
+                    {(value: string | null) =>
+                      !value || value === "all" ? "Todos los proyectos" : value
+                    }
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los proyectos</SelectItem>
+                  {projects.map((project) => (
+                    <SelectItem key={project} value={project}>
+                      {project}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
             {filteredCampaigns.length === 0 ? (
               <Empty>
@@ -90,7 +137,12 @@ function RouteComponent() {
                     <Item variant="outline">
                       <ItemContent>
                         <ItemTitle>
-                          {campaign.name} — {campaign.project?.name}
+                          {campaign.name}
+                          {campaign.project?.name && (
+                            <Badge variant="secondary">
+                              {campaign.project.name}
+                            </Badge>
+                          )}
                         </ItemTitle>
                         {campaign.description && (
                           <ItemDescription>
