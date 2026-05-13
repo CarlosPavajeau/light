@@ -32,7 +32,7 @@ const signUpSchema = z.object({
   name: z
     .string()
     .min(3, {
-      message: "Por favor, ingresa tu nombre.",
+      message: "Por favor, ingresa tu nombre completo.",
     })
     .transform((name) => name.trim().toUpperCase()),
   email: z.email({
@@ -104,7 +104,7 @@ function RouteComponent() {
             name="name"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Nombre</FieldLabel>
+                <FieldLabel htmlFor={field.name}>Nombre completo</FieldLabel>
                 <Input
                   {...field}
                   id={field.name}
