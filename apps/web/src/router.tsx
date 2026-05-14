@@ -13,7 +13,11 @@ import { TRPCProvider } from "./utils/trpc"
 
 export const queryClient = new QueryClient({
   queryCache: new QueryCache(),
-  defaultOptions: { queries: { staleTime: 60 * 1000 } },
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,
+    },
+  },
 })
 
 const trpcClient = createTRPCClient<AppRouter>({
