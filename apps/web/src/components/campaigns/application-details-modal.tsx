@@ -13,6 +13,7 @@ import type { inferRouterOutputs } from "@trpc/server"
 import { format, parseISO } from "date-fns"
 import { es } from "date-fns/locale"
 import { ExternalLinkIcon } from "lucide-react"
+import { useState } from "react"
 
 import { useTRPC } from "@/utils/trpc"
 
@@ -127,6 +128,7 @@ export function ApplicationDetailsModal({
 }: Props) {
   const trpc = useTRPC()
   const queryClient = useQueryClient()
+  const [confirmingDiscard, setConfirmingDiscard] = useState(false)
 
   const { data: participant } = useQuery({
     ...trpc.participants.getById.queryOptions(application?.participantId ?? 0),
@@ -153,6 +155,18 @@ export function ApplicationDetailsModal({
     },
   })
 
+  const { mutate: discardApplication, isPending: isDiscarding } = useMutation({
+    ...trpc.campaigns.deleteApplication.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(
+        trpc.campaigns.listApplications.queryFilter({
+          campaignId: application?.campaignId ?? 0,
+        })
+      )
+      onOpenChange(false)
+    },
+  })
+
   const handleDownload = () => {
     if (!application || !application.attachedFile) {
       return
@@ -173,6 +187,16 @@ export function ApplicationDetailsModal({
     })
   }
 
+  const handleDiscard = () => {
+    if (!application) {
+      return
+    }
+    discardApplication({
+      campaignId: application.campaignId,
+      participantId: application.participantId,
+    })
+  }
+
   if (!participant || !application) {
     return null
   }
@@ -181,7 +205,13 @@ export function ApplicationDetailsModal({
   const isReviewed = application.status === "reviewed"
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        setConfirmingDiscard(false)
+        onOpenChange(next)
+      }}
+    >
       <DialogContent className="md:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -200,19 +230,47 @@ export function ApplicationDetailsModal({
           </dl>
         </div>
 
-        <DialogFooter showCloseButton>
-          <Button
-            variant={isReviewed ? "outline" : "default"}
-            onClick={handleToggleStatus}
-            disabled={isUpdatingStatus}
-          >
-            {isReviewed ? "Marcar como pendiente" : "Marcar como revisada"}
-          </Button>
-          <Button onClick={handleDownload} disabled={isPending}>
-            Ver archivo adjunto
-            <ExternalLinkIcon data-icon="inline-end" />
-          </Button>
-        </DialogFooter>
+        {confirmingDiscard ? (
+          <DialogFooter>
+            <p className="mr-auto self-center text-sm text-muted-foreground">
+              ¿Confirmar descarte?
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => setConfirmingDiscard(false)}
+              disabled={isDiscarding}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDiscard}
+              disabled={isDiscarding}
+            >
+              Sí, descartar
+            </Button>
+          </DialogFooter>
+        ) : (
+          <DialogFooter showCloseButton>
+            <Button
+              variant="destructive"
+              onClick={() => setConfirmingDiscard(true)}
+            >
+              Descartar aplicación
+            </Button>
+            <Button
+              variant={isReviewed ? "outline" : "default"}
+              onClick={handleToggleStatus}
+              disabled={isUpdatingStatus}
+            >
+              {isReviewed ? "Marcar como pendiente" : "Marcar como revisada"}
+            </Button>
+            <Button onClick={handleDownload} disabled={isPending}>
+              Ver archivo adjunto
+              <ExternalLinkIcon data-icon="inline-end" />
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   )

@@ -23,6 +23,11 @@ export const updateApplicationStatusSchema = z.object({
   status: z.enum(["pending", "reviewed"]),
 })
 
+export const deleteApplicationSchema = z.object({
+  campaignId: z.number(),
+  participantId: z.number(),
+})
+
 export const addApplicationSchema = z.object({
   campaignId: z.number(),
   participantId: z.number(),

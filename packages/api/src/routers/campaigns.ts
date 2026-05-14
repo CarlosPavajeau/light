@@ -1,5 +1,6 @@
 import { db } from "@light/db"
 import {
+  deleteApplication,
   updateApplicationStatus,
   updateCampaign,
 } from "@light/db/queries/campaigns"
@@ -11,6 +12,7 @@ import { newId } from "../lib/uid"
 import {
   addApplicationSchema,
   createCampaignSchema,
+  deleteApplicationSchema,
   updateApplicationStatusSchema,
   updateCampaignSchema,
 } from "../schemas/campaigns"
@@ -162,5 +164,12 @@ export const campaignsRouter = router({
     .mutation(async ({ input }) => {
       const { campaignId, participantId, status } = input
       return updateApplicationStatus(campaignId, participantId, status)
+    }),
+
+  deleteApplication: protectedProcedure
+    .input(deleteApplicationSchema)
+    .mutation(async ({ input }) => {
+      const { campaignId, participantId } = input
+      await deleteApplication(campaignId, participantId)
     }),
 })

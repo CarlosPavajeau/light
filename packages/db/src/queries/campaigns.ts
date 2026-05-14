@@ -40,3 +40,17 @@ export async function updateApplicationStatus(
 
   return updated
 }
+
+export async function deleteApplication(
+  campaignId: number,
+  participantId: number
+) {
+  await db
+    .delete(campaignApplications)
+    .where(
+      and(
+        eq(campaignApplications.campaignId, campaignId),
+        eq(campaignApplications.participantId, participantId)
+      )
+    )
+}

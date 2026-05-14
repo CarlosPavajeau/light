@@ -3,6 +3,15 @@ import { addApplicationSchema } from "@light/api/schemas/campaigns"
 import { Alert, AlertDescription, AlertTitle } from "@light/ui/components/alert"
 import { Button } from "@light/ui/components/button"
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@light/ui/components/dialog"
+import {
   Field,
   FieldDescription,
   FieldError,
@@ -54,9 +63,14 @@ const formatAmount = (value: string | null | undefined) => {
 type Props = {
   campaignId: number
   participantId: number
+  allowDiscard?: boolean
 }
 
-export function CampaignApplicationForm({ campaignId, participantId }: Props) {
+export function CampaignApplicationForm({
+  campaignId,
+  participantId,
+  allowDiscard = false,
+}: Props) {
   const trpc = useTRPC()
   const trpcClient = useTRPCClient()
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -166,6 +180,19 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
       },
     }
   )
+
+  const { mutate: discardApplication, isPending: isDiscarding } = useMutation({
+    ...trpc.campaigns.deleteApplication.mutationOptions(),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: trpc.campaigns.getApplication.queryOptions({
+          campaignId,
+          participantId,
+        }).queryKey,
+      })
+      toast.success("Aplicación descartada")
+    },
+  })
 
   if (isLoading) {
     return <span>Cargando...</span>
@@ -419,6 +446,37 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
           Ver archivo adjunto
           <ExternalLinkIcon data-icon="inline-end" />
         </Button>
+      )}
+
+      {allowDiscard && (
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="destructive" disabled={isDiscarding}>
+              Descartar aplicación
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>¿Descartar aplicación?</DialogTitle>
+              <DialogDescription>
+                Esta acción eliminará tu aplicación actual. Podrás enviar una
+                nueva aplicación a esta campaña.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter showCloseButton>
+              <Button
+                variant="destructive"
+                disabled={isDiscarding}
+                onClick={() =>
+                  discardApplication({ campaignId, participantId })
+                }
+              >
+                {isDiscarding && <Spinner />}
+                Sí, descartar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   )
