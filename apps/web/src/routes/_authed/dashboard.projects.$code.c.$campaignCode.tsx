@@ -84,13 +84,17 @@ function CampaignParticipants({ campaignId }: CampaignParticipantsProps) {
     enabled: !!campaignId,
   })
   const [applicationDetailsOpen, setApplicationDetailsOpen] = useState(false)
-  const [currentApplication, setCurrentApplication] = useState<
-    Application | undefined
+  const [currentApplicationCode, setCurrentApplicationCode] = useState<
+    string | undefined
   >()
   const [search, setSearch] = useState("")
 
+  const currentApplication = applications?.find(
+    (a) => a.code === currentApplicationCode
+  )
+
   const handleApplicationViewDetailsClick = (application: Application) => {
-    setCurrentApplication(application)
+    setCurrentApplicationCode(application.code)
     setApplicationDetailsOpen(true)
   }
 
