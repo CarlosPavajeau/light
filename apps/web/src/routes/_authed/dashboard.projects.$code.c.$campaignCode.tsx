@@ -1,20 +1,23 @@
 import type { AppRouter } from "@light/api/routers/index"
 import { Badge } from "@light/ui/components/badge"
 import { Button } from "@light/ui/components/button"
-import { Input } from "@light/ui/components/input"
 import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemDescription,
-  ItemTitle,
-} from "@light/ui/components/item"
+  Card,
+  CardAction,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@light/ui/components/card"
+import { Input } from "@light/ui/components/input"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import type { inferRouterOutputs } from "@trpc/server"
+import { format } from "date-fns"
 import { useState } from "react"
 
 import { ApplicationDetailsModal } from "@/components/campaigns/application-details-modal"
+import { DetailRow } from "@/components/detail-row"
 import { useTRPC } from "@/utils/trpc"
 
 export const Route = createFileRoute(
@@ -129,27 +132,41 @@ function CampaignParticipants({ campaignId }: CampaignParticipantsProps) {
       )}
       <ul className="flex flex-col gap-2">
         {filteredApplications?.map((application) => (
-          <Item key={application.id} variant="muted">
-            <ItemContent>
-              <ItemTitle>
-                {application.name} {application.lastName}{" "}
+          <Card key={application.code}>
+            <CardHeader>
+              <CardTitle>
+                {application.name} {application.lastName}
+              </CardTitle>
+              <CardAction>
                 <Badge>
                   {application.status === "pending" ? "Pendiente" : "Revisada"}
                 </Badge>
-              </ItemTitle>
-              <ItemDescription>
-                N° Voucher: {application.voucher ?? "N/A"}, Número de cuenta:{" "}
-                {application.accountNumber ?? "N/A"}
-              </ItemDescription>
-            </ItemContent>
-            <ItemActions>
+              </CardAction>
+            </CardHeader>
+            <CardContent>
+              <dl className="flex flex-col gap-3">
+                <DetailRow
+                  label="Documento"
+                  value={application.documentNumber ?? "N/A"}
+                />
+                <DetailRow
+                  label="Fecha de aplicación"
+                  value={format(
+                    new Date(application.createdAt ?? ""),
+                    "dd/MM/yyyy hh:mm a"
+                  )}
+                />
+              </dl>
+            </CardContent>
+
+            <CardFooter>
               <Button
                 onClick={() => handleApplicationViewDetailsClick(application)}
               >
                 Ver detalles
               </Button>
-            </ItemActions>
-          </Item>
+            </CardFooter>
+          </Card>
         ))}
       </ul>
     </>
