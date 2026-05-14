@@ -1,4 +1,5 @@
 import type { AppRouter } from "@light/api/routers/index"
+import { Badge } from "@light/ui/components/badge"
 import { Button } from "@light/ui/components/button"
 import { Input } from "@light/ui/components/input"
 import {
@@ -131,7 +132,10 @@ function CampaignParticipants({ campaignId }: CampaignParticipantsProps) {
           <Item key={application.id} variant="muted">
             <ItemContent>
               <ItemTitle>
-                {application.name} {application.lastName}
+                {application.name} {application.lastName}{" "}
+                <Badge>
+                  {application.status === "pending" ? "Pendiente" : "Revisada"}
+                </Badge>
               </ItemTitle>
               <ItemDescription>
                 N° Voucher: {application.voucher ?? "N/A"}, Número de cuenta:{" "}

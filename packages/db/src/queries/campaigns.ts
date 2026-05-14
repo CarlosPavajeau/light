@@ -1,7 +1,7 @@
-import { eq } from "drizzle-orm"
+import { and, eq } from "drizzle-orm"
 
 import { db } from ".."
-import { campaigns } from "../schema"
+import { campaignApplications, campaigns } from "../schema"
 
 type UpdateCampaignParams = {
   id: number
@@ -17,6 +17,25 @@ export async function updateCampaign(campaign: UpdateCampaignParams) {
     .update(campaigns)
     .set(rest)
     .where(eq(campaigns.id, id))
+    .returning()
+
+  return updated
+}
+
+export async function updateApplicationStatus(
+  campaignId: number,
+  participantId: number,
+  status: string
+) {
+  const [updated] = await db
+    .update(campaignApplications)
+    .set({ status })
+    .where(
+      and(
+        eq(campaignApplications.campaignId, campaignId),
+        eq(campaignApplications.participantId, participantId)
+      )
+    )
     .returning()
 
   return updated

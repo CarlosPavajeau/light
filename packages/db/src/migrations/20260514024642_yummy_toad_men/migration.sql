@@ -1,0 +1,1 @@
+ALTER TABLE "campaign_applications" ADD COLUMN "status" text DEFAULT 'pending' NOT NULL;

@@ -17,6 +17,12 @@ export const updateCampaignSchema = z.object({
   isActive: z.boolean(),
 })
 
+export const updateApplicationStatusSchema = z.object({
+  campaignId: z.number(),
+  participantId: z.number(),
+  status: z.enum(["pending", "reviewed"]),
+})
+
 export const addApplicationSchema = z.object({
   campaignId: z.number(),
   participantId: z.number(),
