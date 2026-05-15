@@ -116,7 +116,7 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
       return
     }
 
-    let attachedFile: string
+    let attachedFile: string | undefined
     try {
       const { url, key } = await trpcClient.external.presignUpload.mutate()
 
@@ -135,6 +135,10 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
       setError("attachedFile", {
         message: "Error al subir el comprobante de pago",
       })
+      return
+    }
+
+    if (!attachedFile) {
       return
     }
 
