@@ -254,18 +254,6 @@ export function ApplicationDetailsModal({
         ) : (
           <DialogFooter showCloseButton>
             <Button
-              variant="outline"
-              render={
-                <Link
-                  to="/dashboard/participants/$id/edit"
-                  params={{ id: String(application.participantId) }}
-                />
-              }
-              nativeButton={false}
-            >
-              Editar participante
-            </Button>
-            <Button
               variant="destructive"
               onClick={() => setConfirmingDiscard(true)}
             >

@@ -163,11 +163,24 @@ function CampaignParticipants({ campaignId }: CampaignParticipantsProps) {
               </dl>
             </CardContent>
 
-            <CardFooter>
+            <CardFooter className="gap-2">
               <Button
                 onClick={() => handleApplicationViewDetailsClick(application)}
               >
                 Ver detalles
+              </Button>
+
+              <Button
+                variant="outline"
+                render={
+                  <Link
+                    to="/dashboard/participants/$id/edit"
+                    params={{ id: String(application.participantId) }}
+                  />
+                }
+                nativeButton={false}
+              >
+                Editar participante
               </Button>
             </CardFooter>
           </Card>
