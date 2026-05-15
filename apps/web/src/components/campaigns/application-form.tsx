@@ -41,7 +41,7 @@ import { useTRPC, useTRPCClient } from "@/utils/trpc"
 import { DetailRow } from "../detail-row"
 import { ImageUpload } from "./image-upload"
 
-const formatAmount = (value: string | null | undefined) => {
+const formatAmount = (value: string | number | null | undefined) => {
   if (!value) {
     return "NA"
   }
@@ -190,10 +190,6 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
       return
     }
 
-    if (!attachedFile) {
-      return
-    }
-
     try {
       await apply({ ...data, attachedFile })
     } catch (error) {
@@ -229,7 +225,7 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
       ...trpc.external.presignDownload.mutationOptions(),
       onSuccess: (result) => {
         if (result.url) {
-          window.open(result.url, "_blank")
+          window.open(result.url, "_blank", "noopener")
         }
       },
     }
@@ -480,7 +476,7 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
       {application.attachedFile && (
         <Button
           variant="outline"
-          onClick={() => presignDownload(application.attachedFile ?? "")}
+          onClick={() => presignDownload(application.attachedFile)}
           disabled={isDownloadPending}
         >
           {isDownloadPending && <Spinner />}
