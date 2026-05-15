@@ -12,7 +12,8 @@
         "BETTER_AUTH_URL",
         "CORS_ORIGIN",
         "EXTERNAL_API_URL",
-        "API_KEY"
+        "API_KEY",
+        "SENTRY_AUTH_TOKEN"
       ]
     },
     "lint": {
