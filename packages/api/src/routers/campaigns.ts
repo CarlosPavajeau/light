@@ -188,7 +188,7 @@ export const campaignsRouter = router({
     .input(updateApplicationStatusSchema)
     .mutation(async ({ input }) => {
       const { campaignId, participantId, status } = input
-      return updateApplicationStatus(campaignId, participantId, status)
+      return await updateApplicationStatus(campaignId, participantId, status)
     }),
 
   deleteApplication: protectedProcedure
