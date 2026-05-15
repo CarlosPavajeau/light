@@ -2,6 +2,7 @@ import {
   boolean,
   date,
   index,
+  integer,
   pgTable,
   serial,
   text,
@@ -115,10 +116,10 @@ export const campaignApplications = pgTable(
     attachedFile: text("attached_file"),
     status: text("status").notNull().default("pending"),
     amount: numeric({ precision: 10, scale: 2 }).notNull(),
-    campaignId: serial("campaign_id")
+    campaignId: integer("campaign_id")
       .notNull()
       .references(() => campaigns.id),
-    participantId: serial("participant_id")
+    participantId: integer("participant_id")
       .notNull()
       .references(() => participants.id),
     createdAt: timestamp("created_at", { withTimezone: true })
