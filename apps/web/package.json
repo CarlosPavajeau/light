@@ -3,9 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "vite build",
-    "serve": "vite preview",
-    "dev": "vite dev"
+    "dev": "NODE_OPTIONS='--import ./instrument.server.mjs' vite dev --port 3001",
+    "build": "vite build && cp instrument.server.mjs .vercel/output",
+    "serve": "vite preview"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.8",
@@ -14,6 +14,7 @@
     "@light/auth": "workspace:*",
     "@light/env": "workspace:*",
     "@light/ui": "workspace:*",
+    "@sentry/tanstackstart-react": "^10.53.1",
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/react-query": "^5.99.0",
     "@tanstack/react-router": "^1.168.22",

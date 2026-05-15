@@ -1,7 +1,8 @@
 import type { AppRouter } from "@light/api/routers/index"
-import { QueryCache, QueryClient } from "@tanstack/react-query"
+import * as Sentry from "@sentry/tanstackstart-react"
 
 import "./index.css"
+import { QueryCache, QueryClient } from "@tanstack/react-query"
 import { createRouter as createTanStackRouter } from "@tanstack/react-router"
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query"
 import { createTRPCClient, httpBatchLink } from "@trpc/client"
@@ -53,6 +54,16 @@ export const getRouter = () => {
       </TRPCProvider>
     ),
   })
+
+  if (!router.isServer) {
+    Sentry.init({
+      dsn: "https://5f8b3841c49e7960313979e8f8efb42f@o4503956764950528.ingest.us.sentry.io/4511395301883904",
+
+      // Adds request headers and IP for users, for more info visit:
+      // https://docs.sentry.io/platforms/javascript/guides/tanstackstart-react/configuration/options/#sendDefaultPii
+      sendDefaultPii: true,
+    })
+  }
 
   setupRouterSsrQueryIntegration({
     router,

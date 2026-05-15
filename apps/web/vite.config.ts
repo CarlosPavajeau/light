@@ -1,3 +1,4 @@
+import { sentryTanstackStart } from "@sentry/tanstackstart-react/vite"
 import tailwindcss from "@tailwindcss/vite"
 import { tanstackStart } from "@tanstack/react-start/plugin/vite"
 import viteReact from "@vitejs/plugin-react"
@@ -15,6 +16,11 @@ export default defineConfig({
   plugins: [
     tailwindcss(),
     tanstackStart(),
+    sentryTanstackStart({
+      org: "cantte",
+      project: "light",
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+    }),
     nitro({
       traceDeps: ["react", "react-dom"],
     }),
