@@ -5,6 +5,7 @@ import {
   updateCampaign,
 } from "@light/db/queries/campaigns"
 import { campaignApplications, campaigns } from "@light/db/schema/projects"
+import * as Sentry from "@sentry/core"
 import { z } from "zod/v4"
 
 import { protectedProcedure, router } from ".."
@@ -146,18 +147,40 @@ export const campaignsRouter = router({
 
   addApplication: protectedProcedure
     .input(addApplicationSchema)
-    .mutation(async ({ input }) => {
-      const response = await db
-        .insert(campaignApplications)
-        .values({
-          ...input,
-          code: newId("cppt", 16),
-          amount: input.amount.toString(),
-        })
-        .returning()
+    .mutation(async ({ input }) => Sentry.startSpan(
+        {
+          op: "db.insert",
+          name: "campaigns.addApplication",
+          attributes: {
+            campaignId: input.campaignId,
+            participantId: input.participantId,
+          },
+        },
+        async () => {
+          try {
+            const response = await db
+              .insert(campaignApplications)
+              .values({
+                ...input,
+                code: newId("cppt", 16),
+                amount: input.amount.toString(),
+              })
+              .returning()
 
-      return response
-    }),
+            return response
+          } catch (error) {
+            Sentry.withScope((scope) => {
+              scope.setTag("procedure", "campaigns.addApplication")
+              scope.setContext("input", {
+                campaignId: input.campaignId,
+                participantId: input.participantId,
+              })
+              Sentry.captureException(error)
+            })
+            throw error
+          }
+        }
+      )),
 
   updateApplicationStatus: protectedProcedure
     .input(updateApplicationStatusSchema)

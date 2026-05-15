@@ -72,6 +72,7 @@
         "@light/auth": "workspace:*",
         "@light/db": "workspace:*",
         "@light/env": "workspace:*",
+        "@sentry/core": "^10.53.1",
         "@trpc/client": "catalog:",
         "@trpc/server": "catalog:",
         "dotenv": "catalog:",
