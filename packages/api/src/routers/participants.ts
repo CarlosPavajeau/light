@@ -1,10 +1,15 @@
 import { db } from "@light/db"
+import { updateParticipant } from "@light/db/queries/participants"
 import { participants } from "@light/db/schema/projects"
+import { TRPCError } from "@trpc/server"
 import { z } from "zod/v4"
 
 import { protectedProcedure, router } from ".."
 import { newId } from "../lib/uid"
-import { createParticipantSchema } from "../schemas/participant"
+import {
+  createParticipantSchema,
+  updateParticipantSchema,
+} from "../schemas/participant"
 
 export const participantsRouter = router({
   create: protectedProcedure
@@ -41,4 +46,13 @@ export const participantsRouter = router({
 
     return participant
   }),
+
+  update: protectedProcedure
+    .input(updateParticipantSchema)
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.session.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN" })
+      }
+      return updateParticipant(input)
+    }),
 })

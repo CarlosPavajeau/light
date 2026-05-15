@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@light/ui/components/dialog"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Link } from "@tanstack/react-router"
 import type { inferRouterOutputs } from "@trpc/server"
 import { format, parseISO } from "date-fns"
 import { es } from "date-fns/locale"
@@ -252,6 +253,18 @@ export function ApplicationDetailsModal({
           </DialogFooter>
         ) : (
           <DialogFooter showCloseButton>
+            <Button
+              variant="outline"
+              render={
+                <Link
+                  to="/dashboard/participants/$id/edit"
+                  params={{ id: String(application.participantId) }}
+                />
+              }
+              nativeButton={false}
+            >
+              Editar participante
+            </Button>
             <Button
               variant="destructive"
               onClick={() => setConfirmingDiscard(true)}
