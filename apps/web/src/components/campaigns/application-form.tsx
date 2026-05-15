@@ -26,6 +26,7 @@ import {
 } from "@light/ui/components/select"
 import { Spinner } from "@light/ui/components/spinner"
 import type { FileWithPreview } from "@light/ui/hooks/use-file-upload"
+import * as Sentry from "@sentry/tanstackstart-react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
@@ -127,11 +128,23 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
       })
 
       if (!response.ok) {
-        throw new Error("Error al subir el comprobante de pago")
+        throw new Error(
+          `Upload failed with status ${response.status}: ${response.statusText}`
+        )
       }
 
       attachedFile = key
-    } catch {
+    } catch (error) {
+      Sentry.withScope((scope) => {
+        scope.setTag("action", "voucher_upload")
+        scope.setContext("campaign_application", {
+          campaignId,
+          participantId,
+          fileType: selectedFile.type,
+          fileSize: selectedFile.size,
+        })
+        Sentry.captureException(error)
+      })
       setError("attachedFile", {
         message: "Error al subir el comprobante de pago",
       })
@@ -142,7 +155,19 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
       return
     }
 
-    await apply({ ...data, attachedFile })
+    try {
+      await apply({ ...data, attachedFile })
+    } catch (error) {
+      Sentry.withScope((scope) => {
+        scope.setTag("action", "submit_application")
+        scope.setContext("campaign_application", {
+          campaignId,
+          participantId,
+        })
+        Sentry.captureException(error)
+      })
+      toast.error("Error al enviar la aplicación")
+    }
   })
 
   const handleFilesChange = useCallback(
