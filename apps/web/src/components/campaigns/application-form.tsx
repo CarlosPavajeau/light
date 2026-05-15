@@ -118,8 +118,10 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
     }
 
     let attachedFile: string | undefined
+    let uploadUrlOrigin: string | undefined
     try {
       const { url, key } = await trpcClient.external.presignUpload.mutate()
+      uploadUrlOrigin = new URL(url).origin
 
       const response = await fetch(url, {
         method: "PUT",
@@ -128,21 +130,58 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
       })
 
       if (!response.ok) {
+        let responseBody: string | undefined
+        try {
+          responseBody = await response.text()
+        } catch {
+          console.error("failed to read S3 error response body")
+        }
+
+        console.error("voucher upload HTTP error", {
+          status: response.status,
+          statusText: response.statusText,
+          body: responseBody,
+          url: uploadUrlOrigin,
+        })
+
         throw new Error(
-          `Upload failed with status ${response.status}: ${response.statusText}`
+          `Upload failed with status ${response.status}: ${response.statusText}`,
+          {
+            cause: {
+              status: response.status,
+              statusText: response.statusText,
+              body: responseBody,
+              url: uploadUrlOrigin,
+            },
+          }
         )
       }
 
       attachedFile = key
     } catch (error) {
+      console.error("voucher upload failed", {
+        error,
+        uploadUrlOrigin,
+        fileType: selectedFile.type,
+        fileSize: selectedFile.size,
+      })
+
       Sentry.withScope((scope) => {
         scope.setTag("action", "voucher_upload")
+        scope.setTag(
+          "error_type",
+          error instanceof TypeError ? "network_error" : "http_error"
+        )
         scope.setContext("campaign_application", {
           campaignId,
           participantId,
           fileType: selectedFile.type,
           fileSize: selectedFile.size,
+          uploadUrlOrigin,
         })
+        if (error instanceof Error && error.cause) {
+          scope.setExtra("response_details", error.cause)
+        }
         Sentry.captureException(error)
       })
       setError("attachedFile", {
