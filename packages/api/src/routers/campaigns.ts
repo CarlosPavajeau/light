@@ -147,7 +147,8 @@ export const campaignsRouter = router({
 
   addApplication: protectedProcedure
     .input(addApplicationSchema)
-    .mutation(async ({ input }) => Sentry.startSpan(
+    .mutation(({ input }) =>
+      Sentry.startSpan(
         {
           op: "db.insert",
           name: "campaigns.addApplication",
@@ -180,7 +181,8 @@ export const campaignsRouter = router({
             throw error
           }
         }
-      )),
+      )
+    ),
 
   updateApplicationStatus: protectedProcedure
     .input(updateApplicationStatusSchema)
