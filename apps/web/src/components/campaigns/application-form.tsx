@@ -185,7 +185,7 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
         Sentry.captureException(error)
       })
       setError("attachedFile", {
-        message: "Error al subir el comprobante de pago",
+        message: "Error al subir el comprobante de pago. Inténtalo de nuevo",
       })
       return
     }
