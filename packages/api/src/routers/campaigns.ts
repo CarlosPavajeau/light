@@ -170,6 +170,12 @@ export const campaignsRouter = router({
 
             return response
           } catch (error) {
+            console.error("campaigns.addApplication failed", {
+              error,
+              campaignId: input.campaignId,
+              participantId: input.participantId,
+            })
+
             Sentry.withScope((scope) => {
               scope.setTag("procedure", "campaigns.addApplication")
               scope.setContext("input", {
