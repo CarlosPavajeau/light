@@ -5,15 +5,20 @@ import type {
 } from "@light/ui/hooks/use-file-upload"
 import { formatBytes, useFileUpload } from "@light/ui/hooks/use-file-upload"
 import { cn } from "@light/ui/lib/utils"
-import { FileIcon, PlusIcon, XIcon } from "lucide-react"
+import { FileIcon, FileText, PlusIcon, XIcon } from "lucide-react"
 
 const maxSize = 5 * 1024 * 1024
-const accept = "image/*"
+const accept = "image/*,application/pdf"
 const maxFiles = 1
 
 const isImage = (file: File | FileMetadata) => {
   const type = file instanceof File ? file.type : file.type
   return type.startsWith("image/")
+}
+
+const isPdf = (file: File | FileMetadata) => {
+  const type = file instanceof File ? file.type : file.type
+  return type === "application/pdf"
 }
 
 type Props = {
@@ -86,7 +91,7 @@ export function ImageUpload({ className, onFilesChange }: Props) {
                     className="flex h-12 w-12 items-center justify-center rounded-lg border bg-muted"
                     title={`${fileItem.file.name} (${formatBytes(fileItem.file.size)})`}
                   >
-                    <FileIcon />
+                    {isPdf(fileItem.file) ? <FileText /> : <FileIcon />}
                   </div>
                 )}
                 {/* Remove Button */}
