@@ -62,6 +62,13 @@ export const getRouter = () => {
       // Adds request headers and IP for users, for more info visit:
       // https://docs.sentry.io/platforms/javascript/guides/tanstackstart-react/configuration/options/#sendDefaultPii
       sendDefaultPii: true,
+
+      integrations: [Sentry.replayIntegration()],
+
+      // Capture Replay for 10% of all sessions,
+      // plus for 100% of sessions with an error.
+      replaysSessionSampleRate: 0.1,
+      replaysOnErrorSampleRate: 1,
     })
   }
 
