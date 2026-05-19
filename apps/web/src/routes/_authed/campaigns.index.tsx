@@ -99,14 +99,14 @@ function RouteComponent() {
                 value={selectedProject}
                 onValueChange={(value) => setSelectedProject(value ?? "all")}
               >
-                <SelectTrigger className="min-w-48">
+                <SelectTrigger className="min-w-52">
                   <SelectValue>
                     {(value: string | null) =>
                       !value || value === "all" ? "Todos los proyectos" : value
                     }
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="w-fit">
                   <SelectItem value="all">Todos los proyectos</SelectItem>
                   {projects.map((project) => (
                     <SelectItem key={project} value={project}>
