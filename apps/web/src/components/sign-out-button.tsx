@@ -1,10 +1,9 @@
 import { Button } from "@light/ui/components/button"
+import { Spinner } from "@light/ui/components/spinner"
 import { useMutation } from "@tanstack/react-query"
 import { useRouter } from "@tanstack/react-router"
 
 import { authClient } from "@/lib/auth-client"
-
-import Loader from "./loader"
 
 export function SignOutButton() {
   const router = useRouter()
@@ -17,7 +16,7 @@ export function SignOutButton() {
 
   return (
     <Button onClick={() => signOut()} disabled={isPending}>
-      {isPending && <Loader />}
+      {isPending && <Spinner />}
       Cerrar sesión
     </Button>
   )
