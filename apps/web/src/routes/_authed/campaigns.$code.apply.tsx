@@ -1,5 +1,6 @@
+import { Button } from "@light/ui/components/button"
 import { useQuery } from "@tanstack/react-query"
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router"
 
 import { CampaignApplicationForm } from "@/components/campaigns/application-form"
 import Header from "@/components/header"
@@ -39,6 +40,16 @@ function RouteComponent() {
       <div className="px-4 pt-8 pb-16 sm:px-6">
         <div className="space-y-10 sm:space-y-12">
           <div className="space-y-1">
+            <Button
+              variant="secondary"
+              size="sm"
+              className="w-fit"
+              render={<Link to="/campaigns" />}
+              nativeButton={false}
+            >
+              Volver a las campañas
+            </Button>
+
             <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
               {campaign.name}
             </h1>
