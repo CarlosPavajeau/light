@@ -20,6 +20,8 @@ import {
 } from "@tanstack/react-router"
 import { FolderIcon, UserIcon } from "lucide-react"
 
+import { SignOutButton } from "@/components/sign-out-button"
+
 export const Route = createFileRoute("/_authed/dashboard")({
   beforeLoad: ({ context }) => {
     const { user } = context.session
@@ -48,6 +50,8 @@ function RouteComponent() {
               <SidebarTrigger />
               <span className="font-medium">LUMEN888</span>
             </div>
+
+            <SignOutButton />
           </nav>
         </header>
 

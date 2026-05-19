@@ -3,6 +3,8 @@ import { Link } from "@tanstack/react-router"
 
 import { authClient } from "@/lib/auth-client"
 
+import { SignOutButton } from "./sign-out-button"
+
 export default function Header() {
   const { data } = authClient.useSession()
 
@@ -14,11 +16,15 @@ export default function Header() {
       >
         <span>LUMEN888</span>
 
-        {data && data.user.role === "admin" && (
-          <Button render={<Link to="/dashboard" />} nativeButton={false}>
-            Panel de control
-          </Button>
-        )}
+        <div className="flex gap-2">
+          {data && data.user.role === "admin" && (
+            <Button render={<Link to="/dashboard" />} nativeButton={false}>
+              Panel de control
+            </Button>
+          )}
+
+          <SignOutButton />
+        </div>
       </nav>
     </header>
   )
