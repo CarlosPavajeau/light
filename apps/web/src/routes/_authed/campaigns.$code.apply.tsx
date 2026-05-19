@@ -38,7 +38,7 @@ function RouteComponent() {
       <Header />
 
       <div className="px-4 pt-8 pb-16 sm:px-6">
-        <div className="space-y-10 sm:space-y-12">
+        <div className="space-y-6 sm:space-y-8">
           <div className="space-y-1">
             <Button
               variant="secondary"
