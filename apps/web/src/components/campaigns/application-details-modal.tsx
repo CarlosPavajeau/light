@@ -9,7 +9,6 @@ import {
   DialogTitle,
 } from "@light/ui/components/dialog"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Link } from "@tanstack/react-router"
 import type { inferRouterOutputs } from "@trpc/server"
 import { format, parseISO } from "date-fns"
 import { es } from "date-fns/locale"
