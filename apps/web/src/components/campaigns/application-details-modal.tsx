@@ -8,6 +8,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@light/ui/components/dialog"
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@light/ui/components/drawer"
+import { useIsMobile } from "@light/ui/hooks/use-mobile"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type { inferRouterOutputs } from "@trpc/server"
 import { format, parseISO } from "date-fns"
@@ -129,6 +138,7 @@ export function ApplicationDetailsModal({
   const trpc = useTRPC()
   const queryClient = useQueryClient()
   const [confirmingDiscard, setConfirmingDiscard] = useState(false)
+  const isMobile = useIsMobile()
 
   const { data: participant } = useQuery({
     ...trpc.participants.getById.queryOptions(application?.participantId ?? 0),
@@ -197,6 +207,11 @@ export function ApplicationDetailsModal({
     })
   }
 
+  const handleOpenChange = (next: boolean) => {
+    setConfirmingDiscard(false)
+    onOpenChange(next)
+  }
+
   if (!participant || !application) {
     return null
   }
@@ -204,73 +219,101 @@ export function ApplicationDetailsModal({
   const name = `${application.name ?? "NA"} ${application.lastName ?? "NA"}`
   const isReviewed = application.status === "reviewed"
 
+  const headerTitle = (
+    <>
+      Detalles de la aplicación
+      <Badge variant={isReviewed ? "default" : "secondary"}>
+        {isReviewed ? "Revisada" : "Pendiente"}
+      </Badge>
+    </>
+  )
+
+  const bodyContent = (
+    <dl className="flex flex-col gap-3">
+      <DetailRow label="Nombre" value={name} />
+      <ParticipantInfo participant={participant} />
+      <ApplicationPaymentInfo application={application} />
+    </dl>
+  )
+
+  const footerContent = confirmingDiscard ? (
+    <>
+      <p className="mr-auto self-center text-sm text-muted-foreground">
+        ¿Confirmar descarte?
+      </p>
+      <Button
+        variant="outline"
+        onClick={() => setConfirmingDiscard(false)}
+        disabled={isDiscarding}
+      >
+        Cancelar
+      </Button>
+      <Button
+        variant="destructive"
+        onClick={handleDiscard}
+        disabled={isDiscarding}
+      >
+        Sí, descartar
+      </Button>
+    </>
+  ) : (
+    <>
+      <Button variant="destructive" onClick={() => setConfirmingDiscard(true)}>
+        Descartar aplicación
+      </Button>
+      <Button
+        variant={isReviewed ? "outline" : "default"}
+        onClick={handleToggleStatus}
+        disabled={isUpdatingStatus}
+      >
+        {isReviewed ? "Marcar como pendiente" : "Marcar como revisada"}
+      </Button>
+      <Button onClick={handleDownload} disabled={isPending}>
+        Ver archivo adjunto
+        <ExternalLinkIcon data-icon="inline-end" />
+      </Button>
+    </>
+  )
+
+  if (isMobile) {
+    return (
+      <Drawer open={open} onOpenChange={handleOpenChange}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle className="flex items-center justify-center gap-2">
+              {headerTitle}
+            </DrawerTitle>
+          </DrawerHeader>
+          <div className="min-h-0 flex-1 overflow-y-auto px-4">
+            {bodyContent}
+          </div>
+          <DrawerFooter className="flex-col-reverse border-t bg-muted/50 sm:flex-row sm:justify-end">
+            {footerContent}
+            {!confirmingDiscard && (
+              <DrawerClose asChild>
+                <Button variant="outline">Cerrar</Button>
+              </DrawerClose>
+            )}
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    )
+  }
+
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(next) => {
-        setConfirmingDiscard(false)
-        onOpenChange(next)
-      }}
-    >
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="md:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            Detalles de la aplicación
-            <Badge variant={isReviewed ? "default" : "secondary"}>
-              {isReviewed ? "Revisada" : "Pendiente"}
-            </Badge>
+            {headerTitle}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="-mx-4 max-h-[70vh] overflow-y-auto px-4">
-          <dl className="flex flex-col gap-3">
-            <DetailRow label="Nombre" value={name} />
-            <ParticipantInfo participant={participant} />
-            <ApplicationPaymentInfo application={application} />
-          </dl>
+        <div className="-mx-4 max-h-[60vh] overflow-y-auto px-4">
+          {bodyContent}
         </div>
 
-        {confirmingDiscard ? (
-          <DialogFooter>
-            <p className="mr-auto self-center text-sm text-muted-foreground">
-              ¿Confirmar descarte?
-            </p>
-            <Button
-              variant="outline"
-              onClick={() => setConfirmingDiscard(false)}
-              disabled={isDiscarding}
-            >
-              Cancelar
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDiscard}
-              disabled={isDiscarding}
-            >
-              Sí, descartar
-            </Button>
-          </DialogFooter>
-        ) : (
-          <DialogFooter showCloseButton>
-            <Button
-              variant="destructive"
-              onClick={() => setConfirmingDiscard(true)}
-            >
-              Descartar aplicación
-            </Button>
-            <Button
-              variant={isReviewed ? "outline" : "default"}
-              onClick={handleToggleStatus}
-              disabled={isUpdatingStatus}
-            >
-              {isReviewed ? "Marcar como pendiente" : "Marcar como revisada"}
-            </Button>
-            <Button onClick={handleDownload} disabled={isPending}>
-              Ver archivo adjunto
-              <ExternalLinkIcon data-icon="inline-end" />
-            </Button>
-          </DialogFooter>
-        )}
+        <DialogFooter showCloseButton>{footerContent}</DialogFooter>
       </DialogContent>
     </Dialog>
   )
