@@ -23,6 +23,7 @@ import { toast } from "sonner"
 import z from "zod/v4"
 
 import { authClient } from "@/lib/auth-client"
+import { queryClient } from "@/router"
 
 export const Route = createFileRoute("/sign-in")({
   component: RouteComponent,
@@ -64,6 +65,7 @@ function RouteComponent() {
     },
     onSuccess: (result) => {
       if (result.data) {
+        queryClient.clear()
         navigate({
           to: "/dashboard",
         })

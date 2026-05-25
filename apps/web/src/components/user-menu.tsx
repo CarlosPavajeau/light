@@ -12,6 +12,7 @@ import { Skeleton } from "@light/ui/components/skeleton"
 import { Link, useNavigate } from "@tanstack/react-router"
 
 import { authClient } from "@/lib/auth-client"
+import { queryClient } from "@/router"
 
 export default function UserMenu() {
   const navigate = useNavigate()
@@ -42,6 +43,7 @@ export default function UserMenu() {
           <DropdownMenuItem
             variant="destructive"
             onClick={() => {
+              queryClient.clear()
               authClient.signOut({
                 fetchOptions: {
                   onSuccess: () => {
