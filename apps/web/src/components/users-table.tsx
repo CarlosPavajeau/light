@@ -23,6 +23,7 @@ import { useState } from "react"
 import { TablePagination } from "./data-table/pagination"
 import { DataTable } from "./data-table/table"
 import { ResetPasswordDialog } from "./users/reset-password-dialog"
+import { UpdateUserDialog } from "./users/update-user-dialog"
 
 const columnHelper = createColumnHelper<UserWithRole>()
 
@@ -118,7 +119,8 @@ export function UsersTable({ users }: Props) {
 }
 
 function RowActions({ user }: { user: UserWithRole }) {
-  const [open, setOpen] = useState(false)
+  const [openReset, setOpenReset] = useState(false)
+  const [openUpdate, setOpenUpdate] = useState(false)
 
   return (
     <>
@@ -136,13 +138,25 @@ function RowActions({ user }: { user: UserWithRole }) {
           }
         />
         <DropdownMenuContent align="end" className="min-w-48">
-          <DropdownMenuItem onClick={() => setOpen(true)}>
+          <DropdownMenuItem onClick={() => setOpenUpdate(true)}>
+            Actualizar datos
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setOpenReset(true)}>
             Reestablecer contraseña
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <ResetPasswordDialog user={user} open={open} onOpenChange={setOpen} />
+      <UpdateUserDialog
+        user={user}
+        open={openUpdate}
+        onOpenChange={setOpenUpdate}
+      />
+      <ResetPasswordDialog
+        user={user}
+        open={openReset}
+        onOpenChange={setOpenReset}
+      />
     </>
   )
 }
