@@ -7,25 +7,30 @@ import {
   DropdownMenuTrigger,
 } from "@light/ui/components/dropdown-menu"
 import { Input } from "@light/ui/components/input"
-import type { ColumnFiltersState, PaginationState } from "@tanstack/react-table"
+import type { PaginationState } from "@tanstack/react-table"
 import {
   createColumnHelper,
   getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import type { UserWithRole } from "better-auth/plugins"
 import { MoreHorizontalIcon } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 import { TablePagination } from "./data-table/pagination"
 import { DataTable } from "./data-table/table"
 import { ResetPasswordDialog } from "./users/reset-password-dialog"
 import { UpdateUserDialog } from "./users/update-user-dialog"
 
-const columnHelper = createColumnHelper<UserWithRole>()
+export type UsersTableUser = {
+  banned: boolean | null
+  email: string
+  id: string
+  name: string
+  role?: string | null
+}
+
+const columnHelper = createColumnHelper<UsersTableUser>()
 
 const columns = [
   columnHelper.display({
@@ -43,9 +48,6 @@ const columns = [
     ),
     header: "Usuario",
     id: "user",
-    filterFn: (row, _, value) =>
-      row.original.name.toLowerCase().includes(value.toLowerCase()) ||
-      row.original.email.toLowerCase().includes(value.toLowerCase()),
   }),
   columnHelper.accessor("role", {
     cell: ({ getValue }) => {
@@ -75,29 +77,61 @@ const columns = [
 ]
 
 type Props = {
-  users: UserWithRole[]
+  onPaginationChange: (page: number, pageSize: number) => void
+  onSearchChange: (search: string) => void
+  page: number
+  pageSize: number
+  search: string
+  totalPages: number
+  users: UsersTableUser[]
 }
 
-export function UsersTable({ users }: Props) {
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  })
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+export function UsersTable({
+  onPaginationChange,
+  onSearchChange,
+  page,
+  pageSize,
+  search,
+  totalPages,
+  users,
+}: Props) {
+  const [searchValue, setSearchValue] = useState(search)
+  const pagination = useMemo<PaginationState>(
+    () => ({
+      pageIndex: page - 1,
+      pageSize,
+    }),
+    [page, pageSize]
+  )
+
+  useEffect(() => {
+    setSearchValue(search)
+  }, [search])
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      if (searchValue !== search) {
+        onSearchChange(searchValue)
+      }
+    }, 300)
+
+    return () => window.clearTimeout(timeout)
+  }, [onSearchChange, search, searchValue])
 
   const table = useReactTable({
     columns,
     data: users,
-    pageCount: Math.ceil(users.length / pagination.pageSize),
+    manualPagination: true,
+    pageCount: totalPages,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    onPaginationChange: setPagination,
-    onColumnFiltersChange: setColumnFilters,
+    onPaginationChange: (updater) => {
+      const nextPagination =
+        typeof updater === "function" ? updater(pagination) : updater
+      onPaginationChange(nextPagination.pageIndex + 1, nextPagination.pageSize)
+    },
     state: {
       pagination,
-      columnFilters,
     },
   })
 
@@ -106,10 +140,9 @@ export function UsersTable({ users }: Props) {
       <div className="max-w-md">
         <Input
           id="search-users"
+          value={searchValue}
           placeholder="Buscar usuarios..."
-          onChange={(e) =>
-            table.setColumnFilters([{ id: "user", value: e.target.value }])
-          }
+          onChange={(e) => setSearchValue(e.target.value)}
         />
       </div>
       <DataTable table={table} />
@@ -118,7 +151,7 @@ export function UsersTable({ users }: Props) {
   )
 }
 
-function RowActions({ user }: { user: UserWithRole }) {
+function RowActions({ user }: { user: UsersTableUser }) {
   const [openReset, setOpenReset] = useState(false)
   const [openUpdate, setOpenUpdate] = useState(false)
 

@@ -30,7 +30,17 @@ export const users = pgTable(
       .default(sql`now()`)
       .notNull(),
   },
-  (table) => [unique("users_email_unique").on(table.email)]
+  (table) => [
+    index("users_name_search_idx").using(
+      "gin",
+      sql`lower(${table.name}) gin_trgm_ops`
+    ),
+    index("users_email_search_idx").using(
+      "gin",
+      sql`lower(${table.email}) gin_trgm_ops`
+    ),
+    unique("users_email_unique").on(table.email),
+  ]
 )
 
 export const accounts = pgTable(

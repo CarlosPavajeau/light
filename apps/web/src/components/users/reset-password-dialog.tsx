@@ -22,13 +22,13 @@ import {
 } from "@light/ui/components/input-group"
 import { Spinner } from "@light/ui/components/spinner"
 import { useMutation } from "@tanstack/react-query"
-import type { UserWithRole } from "better-auth/plugins"
 import { EyeClosedIcon, EyeIcon } from "lucide-react"
 import { useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod/v4"
 
+import type { UsersTableUser } from "@/components/users-table"
 import { authClient } from "@/lib/auth-client"
 
 const resetPasswordSchema = z
@@ -50,7 +50,7 @@ type FormValues = z.infer<typeof resetPasswordSchema>
 type Props = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  user: UserWithRole
+  user: Pick<UsersTableUser, "id" | "name">
 }
 
 export function ResetPasswordDialog({ open, onOpenChange, user }: Props) {

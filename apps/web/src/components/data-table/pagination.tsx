@@ -28,7 +28,7 @@ export function TablePagination<T>({ table }: Props<T>) {
           Elementos por página
         </FieldLabel>
         <Select
-          defaultValue="10"
+          value={String(table.getState().pagination.pageSize)}
           onValueChange={(value) => table.setPageSize(Number(value))}
         >
           <SelectTrigger className="w-20" id="select-rows-per-page">

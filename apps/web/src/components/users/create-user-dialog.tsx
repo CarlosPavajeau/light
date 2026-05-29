@@ -37,6 +37,7 @@ import { toast } from "sonner"
 import { z } from "zod/v4"
 
 import { authClient } from "@/lib/auth-client"
+import { useTRPC } from "@/utils/trpc"
 
 const roleLabels: Record<string, string> = {
   user: "Usuario",
@@ -53,7 +54,7 @@ const createUserSchema = z
     confirmPassword: z.string().min(8, {
       message: "La contraseña debe tener al menos 8 caracteres",
     }),
-    role: z.string().optional(),
+    role: z.enum(["user", "admin"]).optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Las contraseñas no coinciden",
@@ -64,6 +65,7 @@ type FormValues = z.infer<typeof createUserSchema>
 
 export function CreateUserDialog() {
   const [open, setOpen] = useState(false)
+  const trpc = useTRPC()
   const {
     control,
     handleSubmit,
@@ -92,7 +94,7 @@ export function CreateUserDialog() {
       }),
     onSuccess: () => {
       toast.success("Usuario creado exitosamente")
-      queryClient.invalidateQueries({ queryKey: ["users", "list"] })
+      queryClient.invalidateQueries(trpc.users.list.queryFilter())
       reset()
       setOpen(false)
     },

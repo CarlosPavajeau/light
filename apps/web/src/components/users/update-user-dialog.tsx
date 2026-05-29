@@ -16,12 +16,13 @@ import {
 import { Input } from "@light/ui/components/input"
 import { Spinner } from "@light/ui/components/spinner"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import type { UserWithRole } from "better-auth/plugins"
 import { useForm, Controller } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod/v4"
 
+import type { UsersTableUser } from "@/components/users-table"
 import { authClient } from "@/lib/auth-client"
+import { useTRPC } from "@/utils/trpc"
 
 const updateUserSchema = z.object({
   name: z.string().min(1, { message: "El nombre es requerido" }),
@@ -33,10 +34,11 @@ type FormValues = z.infer<typeof updateUserSchema>
 type Props = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  user: UserWithRole
+  user: Pick<UsersTableUser, "email" | "id" | "name">
 }
 
 export function UpdateUserDialog({ open, onOpenChange, user }: Props) {
+  const trpc = useTRPC()
   const {
     control,
     handleSubmit,
@@ -60,7 +62,7 @@ export function UpdateUserDialog({ open, onOpenChange, user }: Props) {
       }),
     onSuccess: () => {
       toast.success("Usuario actualizado correctamente")
-      queryClient.invalidateQueries({ queryKey: ["users"] })
+      queryClient.invalidateQueries(trpc.users.list.queryFilter())
       reset()
       onOpenChange(false)
     },
