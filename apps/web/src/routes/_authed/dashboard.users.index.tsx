@@ -6,7 +6,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@light/ui/components/empty"
-import { useQuery } from "@tanstack/react-query"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { UserIcon } from "lucide-react"
 import { useCallback } from "react"
@@ -46,12 +46,13 @@ function RouteComponent() {
   const pageSize = searchParams.pageSize ?? DEFAULT_PAGE_SIZE
   const search = searchParams.search ?? ""
 
-  const { data, isLoading } = useQuery({
+  const { data, isFetching, isLoading } = useQuery({
     ...trpc.users.list.queryOptions({
       page,
       pageSize,
       search,
     }),
+    placeholderData: keepPreviousData,
   })
 
   const updateSearchParams = useCallback(
@@ -80,11 +81,7 @@ function RouteComponent() {
     [navigate]
   )
 
-  if (isLoading) {
-    return <span>Cargando...</span>
-  }
-
-  if (!data || (data.total === 0 && search.length === 0)) {
+  if (!isLoading && (!data || (data.total === 0 && search.length === 0))) {
     return (
       <Empty className="border py-20">
         <EmptyHeader>
@@ -102,7 +99,9 @@ function RouteComponent() {
     )
   }
 
-  const { total, totalPages, users } = data
+  const total = data?.total ?? 0
+  const totalPages = data?.totalPages ?? 0
+  const users = data?.users ?? []
 
   return (
     <div className="space-y-6 sm:space-y-8">
@@ -118,6 +117,7 @@ function RouteComponent() {
       </div>
 
       <UsersTable
+        isLoading={isFetching}
         onPaginationChange={updatePagination}
         onSearchChange={updateSearchParams}
         page={page}

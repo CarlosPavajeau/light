@@ -8,12 +8,54 @@ import {
 } from "@light/ui/components/table"
 import { flexRender } from "@tanstack/react-table"
 import type { Table as TanstackTable } from "@tanstack/react-table"
+import type { ReactNode } from "react"
 
 type Props<T = unknown> = {
+  isLoading?: boolean
+  loadingLabel?: string
   table: TanstackTable<T>
 }
 
-export function DataTable<T = unknown>({ table }: Props<T>) {
+export function DataTable<T = unknown>({
+  isLoading = false,
+  loadingLabel = "Cargando...",
+  table,
+}: Props<T>) {
+  const { rows } = table.getRowModel()
+  let tableBody: ReactNode = (
+    <TableRow>
+      <TableCell
+        className="h-24 text-center"
+        colSpan={table.getAllColumns().length}
+      >
+        Sin resultados.
+      </TableCell>
+    </TableRow>
+  )
+
+  if (isLoading) {
+    tableBody = (
+      <TableRow>
+        <TableCell
+          className="h-24 text-center"
+          colSpan={table.getAllColumns().length}
+        >
+          {loadingLabel}
+        </TableCell>
+      </TableRow>
+    )
+  } else if (rows.length > 0) {
+    tableBody = rows.map((row) => (
+      <TableRow data-state={row.getIsSelected() && "selected"} key={row.id}>
+        {row.getVisibleCells().map((cell) => (
+          <TableCell key={cell.id}>
+            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+          </TableCell>
+        ))}
+      </TableRow>
+    ))
+  }
+
   return (
     <Table>
       <TableHeader>
@@ -33,31 +75,7 @@ export function DataTable<T = unknown>({ table }: Props<T>) {
         ))}
       </TableHeader>
 
-      <TableBody>
-        {table.getRowModel().rows?.length ? (
-          table.getRowModel().rows.map((row) => (
-            <TableRow
-              data-state={row.getIsSelected() && "selected"}
-              key={row.id}
-            >
-              {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))
-        ) : (
-          <TableRow>
-            <TableCell
-              className="h-24 text-center"
-              colSpan={table.getAllColumns().length}
-            >
-              Sin resultados.
-            </TableCell>
-          </TableRow>
-        )}
-      </TableBody>
+      <TableBody>{tableBody}</TableBody>
     </Table>
   )
 }

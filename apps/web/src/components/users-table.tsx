@@ -77,6 +77,7 @@ const columns = [
 ]
 
 type Props = {
+  isLoading?: boolean
   onPaginationChange: (page: number, pageSize: number) => void
   onSearchChange: (search: string) => void
   page: number
@@ -87,6 +88,7 @@ type Props = {
 }
 
 export function UsersTable({
+  isLoading = false,
   onPaginationChange,
   onSearchChange,
   page,
@@ -145,7 +147,11 @@ export function UsersTable({
           onChange={(e) => setSearchValue(e.target.value)}
         />
       </div>
-      <DataTable table={table} />
+      <DataTable
+        table={table}
+        isLoading={isLoading}
+        loadingLabel="Cargando usuarios..."
+      />
       <TablePagination table={table} />
     </div>
   )
