@@ -14,7 +14,7 @@ import {
   InputGroupInput,
 } from "@light/ui/components/input-group"
 import { Spinner } from "@light/ui/components/spinner"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import { EyeClosedIcon, EyeIcon } from "lucide-react"
 import { useState } from "react"
@@ -23,7 +23,6 @@ import { toast } from "sonner"
 import z from "zod/v4"
 
 import { authClient } from "@/lib/auth-client"
-import { queryClient } from "@/router"
 
 export const Route = createFileRoute("/sign-in")({
   component: RouteComponent,
@@ -57,6 +56,7 @@ function RouteComponent() {
     from: "/",
   })
 
+  const queryClient = useQueryClient()
   const { mutateAsync: signIn } = useMutation({
     mutationFn: (data: FormValues) => authClient.signIn.email(data),
     onError: () => {
