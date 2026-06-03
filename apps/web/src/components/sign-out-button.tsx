@@ -2,6 +2,7 @@ import { Button } from "@light/ui/components/button"
 import { Spinner } from "@light/ui/components/spinner"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "@tanstack/react-router"
+import { LogOutIcon } from "lucide-react"
 
 import { authClient } from "@/lib/auth-client"
 
@@ -19,8 +20,9 @@ export function SignOutButton() {
 
   return (
     <Button onClick={() => signOut()} disabled={isPending}>
-      {isPending && <Spinner />}
-      Cerrar sesión
+      {isPending ? <Spinner /> : <LogOutIcon />}
+      <span className="sm:hidden">Salir</span>
+      <span className="hidden sm:inline">Cerrar sesión</span>
     </Button>
   )
 }
