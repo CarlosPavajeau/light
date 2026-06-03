@@ -12,6 +12,13 @@ import {
   FieldSet,
 } from "@light/ui/components/field"
 import { Input } from "@light/ui/components/input"
+import {
+  Autocomplete,
+  AutocompleteContent,
+  AutocompleteInput,
+  AutocompleteItem,
+  AutocompleteList,
+} from "@light/ui/components/reui/autocomplete"
 import { PhoneInput } from "@light/ui/components/reui/phone-input"
 import {
   Select,
@@ -26,6 +33,7 @@ import type { inferRouterOutputs } from "@trpc/server"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 
+import { accountTypes, bankNames, bankSwiftCodes } from "@/lib/constants"
 import { useTRPC } from "@/utils/trpc"
 
 type Participant = NonNullable<
@@ -37,31 +45,37 @@ type Props = {
   onSuccess?: () => void
 }
 
+const toTextValue = (value: string | null | undefined) => value ?? ""
+
 function toDefaultValues(participant: Participant) {
   return {
     id: participant.id,
-    name: participant.name ?? "",
-    lastName: participant.lastName ?? "",
+    name: toTextValue(participant.name),
+    lastName: toTextValue(participant.lastName),
     documentType: (participant.documentType as "CC" | "CE" | "PT") ?? "CC",
-    documentNumber: participant.documentNumber ?? "",
-    documentIssueDate: participant.documentIssueDate ?? "",
-    documentExpirationDate: participant.documentExpirationDate ?? "",
-    documentIssuePlace: participant.documentIssuePlace ?? "",
-    passportNumber: participant.passportNumber ?? "",
-    passportIssueDate: participant.passportIssueDate ?? "",
-    passportExpirationDate: participant.passportExpirationDate ?? "",
-    passportIssuePlace: participant.passportIssuePlace ?? "",
-    birthDate: participant.birthDate ?? "",
-    birthPlace: participant.birthPlace ?? "",
-    email: participant.email ?? "",
-    telegramUsername: participant.telegramUsername ?? "",
-    phone: participant.phone ?? "",
-    residenceCountry: participant.residenceCountry ?? "",
-    residenceState: participant.residenceState ?? "",
-    residenceCity: participant.residenceCity ?? "",
-    address: participant.address ?? "",
-    postalCode: participant.postalCode ?? "",
-    leader: participant.leader ?? "",
+    documentNumber: toTextValue(participant.documentNumber),
+    documentIssueDate: toTextValue(participant.documentIssueDate),
+    documentExpirationDate: toTextValue(participant.documentExpirationDate),
+    documentIssuePlace: toTextValue(participant.documentIssuePlace),
+    passportNumber: toTextValue(participant.passportNumber),
+    passportIssueDate: toTextValue(participant.passportIssueDate),
+    passportExpirationDate: toTextValue(participant.passportExpirationDate),
+    passportIssuePlace: toTextValue(participant.passportIssuePlace),
+    birthDate: toTextValue(participant.birthDate),
+    birthPlace: toTextValue(participant.birthPlace),
+    email: toTextValue(participant.email),
+    telegramUsername: toTextValue(participant.telegramUsername),
+    phone: toTextValue(participant.phone),
+    residenceCountry: toTextValue(participant.residenceCountry),
+    residenceState: toTextValue(participant.residenceState),
+    residenceCity: toTextValue(participant.residenceCity),
+    address: toTextValue(participant.address),
+    postalCode: toTextValue(participant.postalCode),
+    leader: toTextValue(participant.leader),
+    accountNumber: toTextValue(participant.accountNumber),
+    accountType: toTextValue(participant.accountType),
+    bankName: toTextValue(participant.bankName),
+    swiftCode: toTextValue(participant.swiftCode),
   }
 }
 
@@ -73,6 +87,7 @@ export function ParticipantEditForm({ participant, onSuccess }: Props) {
     control,
     handleSubmit,
     formState: { isSubmitting },
+    setValue,
   } = useForm({
     resolver: zodResolver(updateParticipantSchema),
     defaultValues: toDefaultValues(participant),
@@ -349,6 +364,105 @@ export function ParticipantEditForm({ participant, onSuccess }: Props) {
                 )}
               />
             </div>
+          </FieldGroup>
+        </FieldSet>
+
+        <FieldSeparator />
+
+        <FieldSet>
+          <FieldLegend>Información bancaria</FieldLegend>
+          <FieldGroup>
+            <Controller
+              control={control}
+              name="accountNumber"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>N° de cuenta</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    type="text"
+                    aria-invalid={fieldState.invalid}
+                  />
+                  <FieldError errors={[fieldState.error]} />
+                </Field>
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="accountType"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Tipo de cuenta</FieldLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger
+                      className="w-full"
+                      aria-invalid={fieldState.invalid}
+                    >
+                      <SelectValue placeholder="Selecciona un tipo de cuenta" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {accountTypes.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FieldError errors={[fieldState.error]} />
+                </Field>
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="bankName"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Banco</FieldLabel>
+                  <Autocomplete
+                    items={bankNames}
+                    value={field.value}
+                    onValueChange={(value) => {
+                      field.onChange(value)
+                      if (value) {
+                        setValue("swiftCode", bankSwiftCodes[value] ?? "")
+                      }
+                    }}
+                  >
+                    <AutocompleteInput showTrigger showClear />
+                    <AutocompleteContent>
+                      <AutocompleteList>
+                        {(item) => (
+                          <AutocompleteItem key={item} value={item}>
+                            {item}
+                          </AutocompleteItem>
+                        )}
+                      </AutocompleteList>
+                    </AutocompleteContent>
+                  </Autocomplete>
+                  <FieldError errors={[fieldState.error]} />
+                </Field>
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="swiftCode"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Código SWIFT</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    type="text"
+                    aria-invalid={fieldState.invalid}
+                  />
+                  <FieldError errors={[fieldState.error]} />
+                </Field>
+              )}
+            />
           </FieldGroup>
         </FieldSet>
 

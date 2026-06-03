@@ -11,6 +11,13 @@ import {
   FieldSet,
 } from "@light/ui/components/field"
 import { Input } from "@light/ui/components/input"
+import {
+  Autocomplete,
+  AutocompleteContent,
+  AutocompleteInput,
+  AutocompleteItem,
+  AutocompleteList,
+} from "@light/ui/components/reui/autocomplete"
 import { PhoneInput } from "@light/ui/components/reui/phone-input"
 import {
   Select,
@@ -26,6 +33,7 @@ import { useEffect } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 
+import { accountTypes, bankNames, bankSwiftCodes } from "@/lib/constants"
 import { useTRPC } from "@/utils/trpc"
 
 export function ParticipantRegistrationForm() {
@@ -65,6 +73,10 @@ export function ParticipantRegistrationForm() {
       address: "",
       postalCode: "",
       leader: "",
+      accountNumber: "",
+      accountType: "",
+      bankName: "",
+      swiftCode: "",
     },
   })
 
@@ -343,6 +355,105 @@ export function ParticipantRegistrationForm() {
                 )}
               />
             </div>
+          </FieldGroup>
+        </FieldSet>
+
+        <FieldSeparator />
+
+        <FieldSet>
+          <FieldLegend>Información bancaria</FieldLegend>
+          <FieldGroup>
+            <Controller
+              control={control}
+              name="accountNumber"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>N° de cuenta</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    type="text"
+                    aria-invalid={fieldState.invalid}
+                  />
+                  <FieldError errors={[fieldState.error]} />
+                </Field>
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="accountType"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Tipo de cuenta</FieldLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger
+                      className="w-full"
+                      aria-invalid={fieldState.invalid}
+                    >
+                      <SelectValue placeholder="Selecciona un tipo de cuenta" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {accountTypes.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FieldError errors={[fieldState.error]} />
+                </Field>
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="bankName"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Banco</FieldLabel>
+                  <Autocomplete
+                    items={bankNames}
+                    value={field.value}
+                    onValueChange={(value) => {
+                      field.onChange(value)
+                      if (value) {
+                        setValue("swiftCode", bankSwiftCodes[value] ?? "")
+                      }
+                    }}
+                  >
+                    <AutocompleteInput showTrigger showClear />
+                    <AutocompleteContent>
+                      <AutocompleteList>
+                        {(item) => (
+                          <AutocompleteItem key={item} value={item}>
+                            {item}
+                          </AutocompleteItem>
+                        )}
+                      </AutocompleteList>
+                    </AutocompleteContent>
+                  </Autocomplete>
+                  <FieldError errors={[fieldState.error]} />
+                </Field>
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="swiftCode"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Código SWIFT</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    type="text"
+                    aria-invalid={fieldState.invalid}
+                  />
+                  <FieldError errors={[fieldState.error]} />
+                </Field>
+              )}
+            />
           </FieldGroup>
         </FieldSet>
 

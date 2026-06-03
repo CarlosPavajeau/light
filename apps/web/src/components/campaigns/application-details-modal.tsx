@@ -90,6 +90,18 @@ function ParticipantInfo({ participant }: { participant: Participant }) {
         value={`${participant.residenceCity}, ${participant.residenceState}, ${participant.residenceCountry}`}
         subvalue={`${participant.address}${participant.postalCode ? ` - CP ${participant.postalCode}` : ""}`}
       />
+      <DetailRow
+        label="Número de cuenta"
+        value={participant.accountNumber ?? "NA"}
+      />
+      <DetailRow
+        label="Tipo de cuenta"
+        value={participant.accountType ?? "NA"}
+      />
+      <DetailRow label="Banco" value={participant.bankName ?? "NA"} />
+      {participant.swiftCode && (
+        <DetailRow label="Código SWIFT" value={participant.swiftCode} />
+      )}
     </>
   )
 }
@@ -98,18 +110,6 @@ function ApplicationPaymentInfo({ application }: { application: Application }) {
   return (
     <>
       <DetailRow label="Voucher" value={application.voucher ?? "NA"} />
-      <DetailRow
-        label="Número de cuenta"
-        value={application.accountNumber ?? "NA"}
-      />
-      <DetailRow
-        label="Tipo de cuenta"
-        value={application.accountType ?? "NA"}
-      />
-      <DetailRow label="Banco" value={application.bankName ?? "NA"} />
-      {application.swiftCode && (
-        <DetailRow label="Código SWIFT" value={application.swiftCode} />
-      )}
       {application.wallet && (
         <DetailRow label="Billetera" value={application.wallet} />
       )}

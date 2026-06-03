@@ -85,6 +85,10 @@ export const campaignsRouter = router({
               lastName: true,
               email: true,
               documentNumber: true,
+              accountNumber: true,
+              accountType: true,
+              bankName: true,
+              swiftCode: true,
             },
           },
         },
@@ -140,9 +144,28 @@ export const campaignsRouter = router({
           campaignId,
           participantId,
         },
+        with: {
+          participant: {
+            columns: {
+              accountNumber: true,
+              accountType: true,
+              bankName: true,
+              swiftCode: true,
+            },
+          },
+        },
       })
 
-      return response
+      if (!response) {
+        return null
+      }
+
+      const { participant, ...application } = response
+
+      return {
+        ...application,
+        ...participant,
+      }
     }),
 
   addApplication: protectedProcedure

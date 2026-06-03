@@ -85,6 +85,10 @@ export const participants = pgTable(
     address: text("address"),
     postalCode: text("postal_code"),
     leader: text("leader"),
+    accountNumber: text("account_number"),
+    accountType: text("account_type"),
+    bankName: text("bank_name"),
+    swiftCode: text("swift_code"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -107,10 +111,6 @@ export const campaignApplications = pgTable(
   {
     code: text("code").notNull().unique(),
     voucher: text("voucher"),
-    accountNumber: text("account_number"),
-    accountType: text("account_type"),
-    bankName: text("bank_name"),
-    swiftCode: text("swift_code"),
     wallet: text("wallet"),
     walletType: text("wallet_type"),
     attachedFile: text("attached_file"),

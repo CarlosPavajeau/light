@@ -10,20 +10,6 @@ import {
   FieldLabel,
 } from "@light/ui/components/field"
 import { Input } from "@light/ui/components/input"
-import {
-  Autocomplete,
-  AutocompleteContent,
-  AutocompleteInput,
-  AutocompleteItem,
-  AutocompleteList,
-} from "@light/ui/components/reui/autocomplete"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@light/ui/components/select"
 import { Spinner } from "@light/ui/components/spinner"
 import type { FileWithPreview } from "@light/ui/hooks/use-file-upload"
 import * as Sentry from "@sentry/tanstackstart-react"
@@ -35,7 +21,6 @@ import { useCallback, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 
-import { accountTypes, bankNames, bankSwiftCodes } from "@/lib/constants"
 import { useTRPC, useTRPCClient } from "@/utils/trpc"
 
 import { DetailRow } from "../detail-row"
@@ -47,7 +32,7 @@ const formatAmount = (value: string | number | null | undefined) => {
   }
   const num = Number(value)
   if (Number.isNaN(num)) {
-    return value
+    return String(value)
   }
   return num.toLocaleString("es-ES", { style: "currency", currency: "COP" })
 }
@@ -83,10 +68,6 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
       campaignId,
       participantId,
       voucher: "",
-      accountNumber: "",
-      accountType: "",
-      bankName: "",
-      swiftCode: "",
       wallet: "",
       walletType: "",
       attachedFile: "",
@@ -256,98 +237,6 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
             )}
           />
 
-          <Controller
-            control={control}
-            name="accountNumber"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>N° de cuenta</FieldLabel>
-                <Input
-                  {...field}
-                  id={field.name}
-                  type="text"
-                  aria-invalid={fieldState.invalid}
-                />
-                <FieldError errors={[fieldState.error]} />
-              </Field>
-            )}
-          />
-
-          <Controller
-            control={control}
-            name="accountType"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Tipo de cuenta</FieldLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger
-                    className="w-full"
-                    aria-invalid={fieldState.invalid}
-                  >
-                    <SelectValue placeholder="Selecciona un tipo de cuenta" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {accountTypes.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FieldError errors={[fieldState.error]} />
-              </Field>
-            )}
-          />
-
-          <Controller
-            control={control}
-            name="bankName"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Banco</FieldLabel>
-                <Autocomplete
-                  items={bankNames}
-                  value={field.value}
-                  onValueChange={(value) => {
-                    field.onChange(value)
-                    if (value) {
-                      setValue("swiftCode", bankSwiftCodes[value] ?? "")
-                    }
-                  }}
-                >
-                  <AutocompleteInput showTrigger showClear />
-                  <AutocompleteContent>
-                    <AutocompleteList>
-                      {(item) => (
-                        <AutocompleteItem key={item} value={item}>
-                          {item}
-                        </AutocompleteItem>
-                      )}
-                    </AutocompleteList>
-                  </AutocompleteContent>
-                </Autocomplete>
-                <FieldError errors={[fieldState.error]} />
-              </Field>
-            )}
-          />
-
-          <Controller
-            control={control}
-            name="swiftCode"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Código SWIFT</FieldLabel>
-                <Input
-                  {...field}
-                  id={field.name}
-                  type="text"
-                  aria-invalid={fieldState.invalid}
-                />
-                <FieldError errors={[fieldState.error]} />
-              </Field>
-            )}
-          />
-
           <div className="grid grid-cols-2 gap-4">
             <Controller
               control={control}
@@ -476,7 +365,11 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
       {application.attachedFile && (
         <Button
           variant="outline"
-          onClick={() => presignDownload(application.attachedFile)}
+          onClick={() => {
+            if (application.attachedFile) {
+              presignDownload(application.attachedFile)
+            }
+          }}
           disabled={isDownloadPending}
         >
           {isDownloadPending && <Spinner />}

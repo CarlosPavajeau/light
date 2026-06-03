@@ -92,6 +92,26 @@ const participantBaseSchema = z.object({
     )
     .optional(),
   leader: z.string().optional(),
+  accountNumber: z
+    .string()
+    .min(1, { error: "El número de cuenta es obligatorio" })
+    .regex(/^[a-zA-Z0-9]+$/, {
+      error: "El número de cuenta solo puede contener letras y números",
+    }),
+  accountType: z.string().min(1, { error: "El tipo de cuenta es obligatorio" }),
+  bankName: z.string().min(1, { error: "El nombre del banco es obligatorio" }),
+  swiftCode: z
+    .string()
+    .transform((val) => (val === "" ? undefined : val))
+    .pipe(
+      z
+        .string()
+        .regex(/^[a-zA-Z0-9]+$/, {
+          error: "El código SWIFT solo puede contener letras y números",
+        })
+        .optional()
+    )
+    .optional(),
 })
 
 function withParticipantRefinements<T extends typeof participantBaseSchema>(
