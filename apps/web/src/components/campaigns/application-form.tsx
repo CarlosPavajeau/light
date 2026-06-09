@@ -70,6 +70,7 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
       voucher: "",
       wallet: "",
       walletType: "",
+      authorizedAccount: "",
       attachedFile: "",
       amount: "",
     },
@@ -232,6 +233,10 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
                   type="text"
                   aria-invalid={fieldState.invalid}
                 />
+                <FieldDescription>
+                  Ingresa el número de la cuenta a la que realizaste la
+                  consignación.
+                </FieldDescription>
                 <FieldError errors={[fieldState.error]} />
               </Field>
             )}
@@ -274,6 +279,23 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
               )}
             />
           </div>
+
+          <Controller
+            control={control}
+            name="authorizedAccount"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Cuenta autorizada</FieldLabel>
+                <Input
+                  {...field}
+                  id={field.name}
+                  type="text"
+                  aria-invalid={fieldState.invalid}
+                />
+                <FieldError errors={[fieldState.error]} />
+              </Field>
+            )}
+          />
 
           <Controller
             control={control}
@@ -332,6 +354,10 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
 
       <dl className="flex flex-col gap-3">
         <DetailRow label="Voucher" value={application.voucher ?? "NA"} />
+        <DetailRow
+          label="Cuenta autorizada"
+          value={application.authorizedAccount ?? "NA"}
+        />
         <DetailRow
           label="Número de cuenta"
           value={application.accountNumber ?? "NA"}

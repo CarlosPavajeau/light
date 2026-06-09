@@ -47,6 +47,11 @@ export const addApplicationSchema = z.object({
     .transform((val) => (val === "" ? undefined : val))
     .pipe(z.string().optional())
     .optional(),
+  authorizedAccount: z
+    .string()
+    .transform((val) => (val === "" ? undefined : val))
+    .pipe(z.string().optional())
+    .optional(),
   amount: z.coerce
     .number<string>()
     .min(1, { error: "El monto es obligatorio" })

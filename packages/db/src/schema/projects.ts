@@ -113,6 +113,7 @@ export const campaignApplications = pgTable(
     voucher: text("voucher"),
     wallet: text("wallet"),
     walletType: text("wallet_type"),
+    authorizedAccount: text("authorized_account"),
     attachedFile: text("attached_file"),
     status: text("status").notNull().default("pending"),
     amount: numeric({ precision: 10, scale: 2 }).notNull(),

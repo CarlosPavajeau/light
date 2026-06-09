@@ -117,6 +117,10 @@ function ApplicationPaymentInfo({ application }: { application: Application }) {
         <DetailRow label="Tipo de billetera" value={application.walletType} />
       )}
       <DetailRow
+        label="Cuenta autorizada"
+        value={application.authorizedAccount ?? "NA"}
+      />
+      <DetailRow
         label="Valor consignado"
         value={formatAmount(Number(application.amount))}
       />
