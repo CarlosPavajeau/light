@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
+import type { AppRouter } from "@light/api/routers/index"
 import { addApplicationSchema } from "@light/api/schemas/campaigns"
 import { Alert, AlertDescription, AlertTitle } from "@light/ui/components/alert"
 import { Button } from "@light/ui/components/button"
@@ -14,6 +15,7 @@ import { Spinner } from "@light/ui/components/spinner"
 import type { FileWithPreview } from "@light/ui/hooks/use-file-upload"
 import * as Sentry from "@sentry/tanstackstart-react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import type { inferRouterOutputs } from "@trpc/server"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { ExternalLinkIcon } from "lucide-react"
@@ -26,6 +28,15 @@ import { useTRPC, useTRPCClient } from "@/utils/trpc"
 import { DetailRow } from "../detail-row"
 import { ImageUpload } from "./image-upload"
 
+type Application = NonNullable<
+  inferRouterOutputs<AppRouter>["campaigns"]["getApplication"]
+>
+
+type Props = {
+  campaignId: number
+  participantId: number
+}
+
 const formatAmount = (value: string | number | null | undefined) => {
   if (!value) {
     return "NA"
@@ -37,24 +48,95 @@ const formatAmount = (value: string | number | null | undefined) => {
   return num.toLocaleString("es-ES", { style: "currency", currency: "COP" })
 }
 
-type Props = {
+type UploadVoucherParams = {
+  trpcClient: ReturnType<typeof useTRPCClient>
+  file: File
   campaignId: number
   participantId: number
 }
 
-export function CampaignApplicationForm({ campaignId, participantId }: Props) {
+// Returns the uploaded file key, or null when the upload failed (already reported).
+async function uploadVoucher({
+  trpcClient,
+  file,
+  campaignId,
+  participantId,
+}: UploadVoucherParams): Promise<string | null> {
+  let uploadUrlOrigin: string | undefined
+  try {
+    const { url, key } = await trpcClient.external.presignUpload.mutate()
+    uploadUrlOrigin = new URL(url).origin
+
+    const response = await fetch(url, {
+      method: "PUT",
+      body: file,
+      headers: { "Content-Type": file.type },
+    })
+
+    if (!response.ok) {
+      let responseBody: string | undefined
+      try {
+        responseBody = await response.text()
+      } catch {
+        console.error("failed to read S3 error response body")
+      }
+
+      console.error("voucher upload HTTP error", {
+        status: response.status,
+        statusText: response.statusText,
+        body: responseBody,
+        url: uploadUrlOrigin,
+      })
+
+      throw new Error(
+        `Upload failed with status ${response.status}: ${response.statusText}`,
+        {
+          cause: {
+            status: response.status,
+            statusText: response.statusText,
+            body: responseBody,
+            url: uploadUrlOrigin,
+          },
+        }
+      )
+    }
+
+    return key
+  } catch (error) {
+    console.error("voucher upload failed", {
+      error,
+      uploadUrlOrigin,
+      fileType: file.type,
+      fileSize: file.size,
+    })
+
+    Sentry.withScope((scope) => {
+      scope.setTag("action", "voucher_upload")
+      scope.setTag(
+        "error_type",
+        error instanceof TypeError ? "network_error" : "http_error"
+      )
+      scope.setContext("campaign_application", {
+        campaignId,
+        participantId,
+        fileType: file.type,
+        fileSize: file.size,
+        uploadUrlOrigin,
+      })
+      if (error instanceof Error && error.cause) {
+        scope.setExtra("response_details", error.cause)
+      }
+      Sentry.captureException(error)
+    })
+    return null
+  }
+}
+
+function NewApplicationForm({ campaignId, participantId }: Props) {
   const trpc = useTRPC()
   const trpcClient = useTRPCClient()
+  const queryClient = useQueryClient()
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-
-  const { data: application, isLoading } = useQuery({
-    ...trpc.campaigns.getApplication.queryOptions({
-      campaignId,
-      participantId,
-    }),
-    retry: false,
-    refetchOnWindowFocus: false,
-  })
 
   const {
     control,
@@ -76,7 +158,6 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
     },
   })
 
-  const queryClient = useQueryClient()
   const { mutateAsync: apply } = useMutation({
     ...trpc.campaigns.addApplication.mutationOptions(),
     onSuccess: async () => {
@@ -99,73 +180,13 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
       return
     }
 
-    let attachedFile: string | undefined
-    let uploadUrlOrigin: string | undefined
-    try {
-      const { url, key } = await trpcClient.external.presignUpload.mutate()
-      uploadUrlOrigin = new URL(url).origin
-
-      const response = await fetch(url, {
-        method: "PUT",
-        body: selectedFile,
-        headers: { "Content-Type": selectedFile.type },
-      })
-
-      if (!response.ok) {
-        let responseBody: string | undefined
-        try {
-          responseBody = await response.text()
-        } catch {
-          console.error("failed to read S3 error response body")
-        }
-
-        console.error("voucher upload HTTP error", {
-          status: response.status,
-          statusText: response.statusText,
-          body: responseBody,
-          url: uploadUrlOrigin,
-        })
-
-        throw new Error(
-          `Upload failed with status ${response.status}: ${response.statusText}`,
-          {
-            cause: {
-              status: response.status,
-              statusText: response.statusText,
-              body: responseBody,
-              url: uploadUrlOrigin,
-            },
-          }
-        )
-      }
-
-      attachedFile = key
-    } catch (error) {
-      console.error("voucher upload failed", {
-        error,
-        uploadUrlOrigin,
-        fileType: selectedFile.type,
-        fileSize: selectedFile.size,
-      })
-
-      Sentry.withScope((scope) => {
-        scope.setTag("action", "voucher_upload")
-        scope.setTag(
-          "error_type",
-          error instanceof TypeError ? "network_error" : "http_error"
-        )
-        scope.setContext("campaign_application", {
-          campaignId,
-          participantId,
-          fileType: selectedFile.type,
-          fileSize: selectedFile.size,
-          uploadUrlOrigin,
-        })
-        if (error instanceof Error && error.cause) {
-          scope.setExtra("response_details", error.cause)
-        }
-        Sentry.captureException(error)
-      })
+    const attachedFile = await uploadVoucher({
+      trpcClient,
+      file: selectedFile,
+      campaignId,
+      participantId,
+    })
+    if (!attachedFile) {
       setError("attachedFile", {
         message: "Error al subir el comprobante de pago. Inténtalo de nuevo",
       })
@@ -202,6 +223,136 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
     [setValue]
   )
 
+  return (
+    <form onSubmit={onSubmit}>
+      <FieldGroup>
+        <Controller
+          control={control}
+          name="voucher"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>N° Voucher</FieldLabel>
+              <Input
+                {...field}
+                id={field.name}
+                type="text"
+                aria-invalid={fieldState.invalid}
+              />
+              <FieldDescription>
+                Ingresa el número de la cuenta a la que realizaste la
+                consignación.
+              </FieldDescription>
+              <FieldError errors={[fieldState.error]} />
+            </Field>
+          )}
+        />
+
+        <div className="grid grid-cols-2 gap-4">
+          <Controller
+            control={control}
+            name="wallet"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Billetera</FieldLabel>
+                <Input
+                  {...field}
+                  id={field.name}
+                  type="text"
+                  aria-invalid={fieldState.invalid}
+                />
+                <FieldError errors={[fieldState.error]} />
+              </Field>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="walletType"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Tipo de billetera</FieldLabel>
+                <Input
+                  {...field}
+                  id={field.name}
+                  type="text"
+                  aria-invalid={fieldState.invalid}
+                />
+                <FieldError errors={[fieldState.error]} />
+              </Field>
+            )}
+          />
+        </div>
+
+        <Controller
+          control={control}
+          name="authorizedAccount"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>Cuenta autorizada</FieldLabel>
+              <Input
+                {...field}
+                id={field.name}
+                type="text"
+                aria-invalid={fieldState.invalid}
+              />
+              <FieldError errors={[fieldState.error]} />
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="amount"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>Valor consignado</FieldLabel>
+              <Input
+                {...field}
+                id={field.name}
+                type="number"
+                aria-invalid={fieldState.invalid}
+              />
+              <FieldError errors={[fieldState.error]} />
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="attachedFile"
+          render={({ fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel>Comprobante de pago</FieldLabel>
+              <ImageUpload onFilesChange={handleFilesChange} />
+              <FieldDescription>
+                Debes subir una imagen legible del comprobante de pago.
+              </FieldDescription>
+              <FieldError errors={[fieldState.error]} />
+            </Field>
+          )}
+        />
+      </FieldGroup>
+
+      <Button
+        type="submit"
+        className="mt-6 w-full"
+        disabled={isSubmitting}
+        size="lg"
+      >
+        {isSubmitting && <Spinner />}
+        Enviar aplicación
+      </Button>
+    </form>
+  )
+}
+
+function SubmittedApplicationDetails({
+  application,
+}: {
+  application: Application
+}) {
+  const trpc = useTRPC()
+
   const { mutate: presignDownload, isPending: isDownloadPending } = useMutation(
     {
       ...trpc.external.presignDownload.mutationOptions(),
@@ -212,136 +363,6 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
       },
     }
   )
-
-  if (isLoading) {
-    return <span>Cargando...</span>
-  }
-
-  if (!application) {
-    return (
-      <form onSubmit={onSubmit}>
-        <FieldGroup>
-          <Controller
-            control={control}
-            name="voucher"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>N° Voucher</FieldLabel>
-                <Input
-                  {...field}
-                  id={field.name}
-                  type="text"
-                  aria-invalid={fieldState.invalid}
-                />
-                <FieldDescription>
-                  Ingresa el número de la cuenta a la que realizaste la
-                  consignación.
-                </FieldDescription>
-                <FieldError errors={[fieldState.error]} />
-              </Field>
-            )}
-          />
-
-          <div className="grid grid-cols-2 gap-4">
-            <Controller
-              control={control}
-              name="wallet"
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Billetera</FieldLabel>
-                  <Input
-                    {...field}
-                    id={field.name}
-                    type="text"
-                    aria-invalid={fieldState.invalid}
-                  />
-                  <FieldError errors={[fieldState.error]} />
-                </Field>
-              )}
-            />
-
-            <Controller
-              control={control}
-              name="walletType"
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>
-                    Tipo de billetera
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id={field.name}
-                    type="text"
-                    aria-invalid={fieldState.invalid}
-                  />
-                  <FieldError errors={[fieldState.error]} />
-                </Field>
-              )}
-            />
-          </div>
-
-          <Controller
-            control={control}
-            name="authorizedAccount"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Cuenta autorizada</FieldLabel>
-                <Input
-                  {...field}
-                  id={field.name}
-                  type="text"
-                  aria-invalid={fieldState.invalid}
-                />
-                <FieldError errors={[fieldState.error]} />
-              </Field>
-            )}
-          />
-
-          <Controller
-            control={control}
-            name="amount"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Valor consignado</FieldLabel>
-                <Input
-                  {...field}
-                  id={field.name}
-                  type="number"
-                  aria-invalid={fieldState.invalid}
-                />
-                <FieldError errors={[fieldState.error]} />
-              </Field>
-            )}
-          />
-
-          <Controller
-            control={control}
-            name="attachedFile"
-            render={({ fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Comprobante de pago</FieldLabel>
-                <ImageUpload onFilesChange={handleFilesChange} />
-                <FieldDescription>
-                  Debes subir una imagen legible del comprobante de pago.
-                </FieldDescription>
-                <FieldError errors={[fieldState.error]} />
-              </Field>
-            )}
-          />
-        </FieldGroup>
-
-        <Button
-          type="submit"
-          className="mt-6 w-full"
-          disabled={isSubmitting}
-          size="lg"
-        >
-          {isSubmitting && <Spinner />}
-          Enviar aplicación
-        </Button>
-      </form>
-    )
-  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -405,4 +426,32 @@ export function CampaignApplicationForm({ campaignId, participantId }: Props) {
       )}
     </div>
   )
+}
+
+export function CampaignApplicationForm({ campaignId, participantId }: Props) {
+  const trpc = useTRPC()
+
+  const { data: application, isLoading } = useQuery({
+    ...trpc.campaigns.getApplication.queryOptions({
+      campaignId,
+      participantId,
+    }),
+    retry: false,
+    refetchOnWindowFocus: false,
+  })
+
+  if (isLoading) {
+    return <span>Cargando...</span>
+  }
+
+  if (!application) {
+    return (
+      <NewApplicationForm
+        campaignId={campaignId}
+        participantId={participantId}
+      />
+    )
+  }
+
+  return <SubmittedApplicationDetails application={application} />
 }

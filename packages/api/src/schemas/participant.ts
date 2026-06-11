@@ -167,6 +167,8 @@ function withParticipantRefinements<T extends typeof participantBaseSchema>(
   })
 }
 
+export type ParticipantFormInput = z.input<typeof participantBaseSchema>
+
 export const createParticipantSchema = withParticipantRefinements(
   participantBaseSchema.extend({ userId: z.string() })
 )
