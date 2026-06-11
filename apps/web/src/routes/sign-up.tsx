@@ -14,7 +14,7 @@ import {
   InputGroupInput,
 } from "@light/ui/components/input-group"
 import { Spinner } from "@light/ui/components/spinner"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import { EyeClosedIcon, EyeIcon } from "lucide-react"
 import { useState } from "react"
@@ -62,6 +62,7 @@ function RouteComponent() {
     from: "/",
   })
 
+  const queryClient = useQueryClient()
   const { mutateAsync: signUp } = useMutation({
     mutationFn: (data: FormValues) => authClient.signUp.email(data),
     onError: () => {
@@ -70,6 +71,7 @@ function RouteComponent() {
     },
     onSuccess: (result) => {
       if (result.data) {
+        queryClient.clear()
         navigate({
           to: "/dashboard",
         })

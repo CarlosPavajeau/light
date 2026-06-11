@@ -21,7 +21,7 @@ import {
   InputGroupInput,
 } from "@light/ui/components/input-group"
 import { Spinner } from "@light/ui/components/spinner"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { EyeClosedIcon, EyeIcon } from "lucide-react"
 import { useState } from "react"
 import { Controller, useForm } from "react-hook-form"
@@ -30,6 +30,7 @@ import { z } from "zod/v4"
 
 import type { UsersTableUser } from "@/components/users-table"
 import { authClient } from "@/lib/auth-client"
+import { useTRPC } from "@/utils/trpc"
 
 const resetPasswordSchema = z
   .object({
@@ -67,6 +68,9 @@ export function ResetPasswordDialog({ open, onOpenChange, user }: Props) {
     },
   })
 
+  const trpc = useTRPC()
+  const queryClient = useQueryClient()
+
   const { mutateAsync: resetPassword } = useMutation({
     mutationFn: (data: FormValues) =>
       authClient.admin.setUserPassword({
@@ -75,6 +79,7 @@ export function ResetPasswordDialog({ open, onOpenChange, user }: Props) {
       }),
     onSuccess: () => {
       toast.success("Contraseña reestablecida correctamente")
+      queryClient.invalidateQueries(trpc.users.list.queryFilter())
       reset()
       onOpenChange(false)
     },
