@@ -15,7 +15,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import { MoreHorizontalIcon } from "lucide-react"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 
 import { TablePagination } from "./data-table/pagination"
 import { DataTable } from "./data-table/table"
@@ -97,7 +97,6 @@ export function UsersTable({
   totalPages,
   users,
 }: Props) {
-  const [searchValue, setSearchValue] = useState(search)
   const pagination = useMemo<PaginationState>(
     () => ({
       pageIndex: page - 1,
@@ -105,20 +104,23 @@ export function UsersTable({
     }),
     [page, pageSize]
   )
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  useEffect(() => {
-    setSearchValue(search)
-  }, [search])
-
-  useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      if (searchValue !== search) {
-        onSearchChange(searchValue)
+  useEffect(
+    () => () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current)
       }
-    }, 300)
+    },
+    []
+  )
 
-    return () => window.clearTimeout(timeout)
-  }, [onSearchChange, search, searchValue])
+  const handleSearchChange = (value: string) => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current)
+    }
+    searchTimeoutRef.current = setTimeout(() => onSearchChange(value), 300)
+  }
 
   const table = useReactTable({
     columns,
@@ -142,9 +144,9 @@ export function UsersTable({
       <div className="max-w-md">
         <Input
           id="search-users"
-          value={searchValue}
+          defaultValue={search}
           placeholder="Buscar usuarios..."
-          onChange={(e) => setSearchValue(e.target.value)}
+          onChange={(e) => handleSearchChange(e.target.value)}
         />
       </div>
       <DataTable
