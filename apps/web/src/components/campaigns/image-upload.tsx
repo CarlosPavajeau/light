@@ -117,8 +117,8 @@ export function ImageUpload({ className, onFilesChange }: Props) {
       {/* Error Messages */}
       {errors.length > 0 && (
         <>
-          {errors.map((error, index) => (
-            <p key={index} className="last:mb-0">
+          {errors.map((error) => (
+            <p key={error} className="last:mb-0">
               {error}
             </p>
           ))}

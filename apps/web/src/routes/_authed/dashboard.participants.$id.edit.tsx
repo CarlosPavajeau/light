@@ -11,6 +11,10 @@ export const Route = createFileRoute(
   component: EditParticipantPage,
 })
 
+const handleBack = () => {
+  window.history.back()
+}
+
 function EditParticipantPage() {
   const { id } = Route.useParams()
   const trpc = useTRPC()
@@ -18,10 +22,6 @@ function EditParticipantPage() {
   const { data: participant, isLoading } = useQuery(
     trpc.participants.getById.queryOptions(Number(id))
   )
-
-  const handleBack = () => {
-    window.history.back()
-  }
 
   if (isLoading) {
     return <span>Cargando...</span>

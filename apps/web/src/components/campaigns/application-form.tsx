@@ -19,7 +19,7 @@ import type { inferRouterOutputs } from "@trpc/server"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { ExternalLinkIcon } from "lucide-react"
-import { useCallback, useState } from "react"
+import { useCallback, useRef } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 
@@ -136,7 +136,7 @@ function NewApplicationForm({ campaignId, participantId }: Props) {
   const trpc = useTRPC()
   const trpcClient = useTRPCClient()
   const queryClient = useQueryClient()
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const selectedFileRef = useRef<File | null>(null)
 
   const {
     control,
@@ -173,6 +173,7 @@ function NewApplicationForm({ campaignId, participantId }: Props) {
   })
 
   const onSubmit = handleSubmit(async (data) => {
+    const selectedFile = selectedFileRef.current
     if (!selectedFile) {
       setError("attachedFile", {
         message: "El comprobante de pago es obligatorio",
@@ -212,12 +213,12 @@ function NewApplicationForm({ campaignId, participantId }: Props) {
     (files: FileWithPreview[]) => {
       const newFile = files.at(0)
       if (!newFile) {
-        setSelectedFile(null)
+        selectedFileRef.current = null
         setValue("attachedFile", "", { shouldValidate: true })
         return
       }
 
-      setSelectedFile(newFile.file as File)
+      selectedFileRef.current = newFile.file as File
       setValue("attachedFile", "selected", { shouldValidate: true })
     },
     [setValue]
